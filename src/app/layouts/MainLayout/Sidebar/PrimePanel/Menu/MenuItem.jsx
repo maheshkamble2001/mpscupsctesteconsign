@@ -41,7 +41,7 @@ export function MenuItem({ data, className, hideIcon }) {
                 )}
               />
             )}
-            <span className="text-left leading-normal">{title}</span>
+            <span className={`text-left leading-normal ${isActive ? 'text-[#0A0E17]' : 'text-slate-400'}`}>{title}</span>
           </div>
         </>
       )}

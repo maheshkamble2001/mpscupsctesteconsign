@@ -235,6 +235,66 @@ const protectedRoutes = {
 
           ],
         },
+
+        //application management
+        {
+          path: "applicationmanagement",
+          children: [
+            {
+              index: true,
+              element: <Navigate to="/applicationmanagement/manage-subjects" />,
+            },
+            {
+              path: "manage-subjects",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/subjects/index")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300001}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+            {
+              path: "manage-exam-types",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/examtypes/index")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300002}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+            {
+              path: "manage-questions",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/questions/index")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+          ],
+        },
+
         //coursse management
         {
           path: "coursemanagement",

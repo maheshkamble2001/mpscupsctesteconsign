@@ -78,10 +78,10 @@ export function Menu({ nav, pathname }) {
                             <root.Icon
                               className={clsx(
                                 "h-4.5 w-4.5 transition-colors duration-200",
-                                  isChildActive
-                                    ? "text-[#0A0E17] stroke-[2]"
-                                    : "text-slate-500 group-hover:text-white"
-                                )}
+                                isChildActive
+                                  ? "text-[#0A0E17] stroke-[2]"
+                                  : "text-slate-500 group-hover:text-white"
+                              )}
                             />
                           )}
                           <span className="tracking-tight">{root.title}</span>
@@ -89,8 +89,13 @@ export function Menu({ nav, pathname }) {
 
                         <ChevronDownIcon
                           className={clsx(
-                            "h-4 w-4 text-slate-400 transition-transform duration-300",
-                            isOpen ? "rotate-180 text-white" : "group-hover:text-white"
+                            "h-4 w-4 transition-all duration-300",
+                            isChildActive 
+                              ? "text-[#0A0E17]" // Match dark theme accent contrast when child is active
+                              : clsx(
+                                  isOpen ? "text-slate-400" : "text-slate-500 group-hover:text-slate-400",
+                                ),
+                            isOpen && "rotate-180"
                           )}
                         />
                       </div>

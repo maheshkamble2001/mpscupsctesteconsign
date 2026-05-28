@@ -1,3 +1,4 @@
+import { applicationmanagement } from "./applicationNavigation";
 import { coursemanagment } from "./courseNavigatiion";
 import { dashboards } from "./dashboards";
 import { lecturesmanagement } from "./lectures";
@@ -10,7 +11,8 @@ export const navigation = [
   //  lecturesmanagement,
   usermanagement,
   studentmanagement,
-  coursemanagment,
+  applicationmanagement,
+  // coursemanagment,
   menuaccessmanagement,
   
 
