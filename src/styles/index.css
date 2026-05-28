@@ -155,9 +155,9 @@
   --app-bg-card: var(--color-white);
   --app-bg-overlay: var(--color-white, currentColor) / 60%;
 
-   --app-login-card-bg-color1: var(--color-red-600, currentColor) / 70%;
-   --app-login-border-color2: rgba(255, 255, 255, 0.6);
-   --app-bg-color2: var(--color-white);
+  --app-login-card-bg-color1: var(--color-red-600, currentColor) / 70%;
+  --app-login-border-color2: rgba(255, 255, 255, 0.6);
+  --app-bg-color2: var(--color-white);
 
   /* 📝 TEXT */
   --app-text-primary: #111827;

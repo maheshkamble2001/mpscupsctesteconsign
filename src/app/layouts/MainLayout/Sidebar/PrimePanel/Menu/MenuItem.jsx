@@ -19,33 +19,25 @@ export function MenuItem({ data, className, hideIcon }) {
       onClick={() => lgAndDown && close()}
       className={({ isActive }) =>
         clsx(
-          "relative flex items-center w-full transition-all duration-200 group pl-3 pr-2 py-2 rounded-lg",
-          "text-xs+ font-medium tracking-tight",
+          "relative flex items-center w-full transition-all duration-200 group pl-3 pr-2 py-2.5 rounded-xl my-0.5",
+          "text-[13px] font-medium tracking-wide",
           isActive
-            ? "text-primary font-semibold bg-primary/5 dark:bg-primary/10"
-            : "text-slate-500 hover:text-slate-800 hover:bg-slate-50/80 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800/40",
+            ? "text-[#0A0E17] font-semibold bg-[#F5A524]"
+            : "text-slate-400 hover:text-white hover:bg-[#1E293B]/50",
           className
         )
       }
     >
       {({ isActive }) => (
         <>
-          {/* ✨ Left active indicator pill bar */}
-          <span
-            className={clsx(
-              "absolute left-0 top-1/4 h-1/2 w-[3px] rounded-r-full bg-primary transition-all duration-300 origin-left",
-              isActive ? "scale-100 opacity-100" : "scale-0 opacity-0 group-hover:scale-75 group-hover:opacity-60"
-            )}
-          />
-
-          <div className="flex items-center gap-2.5 w-full">
+          <div className="flex items-center gap-3 w-full">
             {!hideIcon && Icon && (
               <Icon
                 className={clsx(
-                  "h-4.5 w-4.5 shrink-0 transition-colors duration-200",
+                  "h-5 w-5 shrink-0 transition-colors duration-200",
                   isActive 
-                    ? "text-primary stroke-[2]" 
-                    : "text-slate-400 group-hover:text-slate-600 dark:text-slate-500 dark:group-hover:text-slate-300"
+                    ? "text-[#0A0E17] stroke-[2]" 
+                    : "text-slate-500 group-hover:text-white"
                 )}
               />
             )}

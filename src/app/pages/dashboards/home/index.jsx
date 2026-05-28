@@ -1,255 +1,290 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { 
-  FileText, Users, Award, IndianRupee, 
-  TrendingUp, ArrowUpRight, PlayCircle, CheckCircle,
-  Calendar, ChevronRight, BarChart3, PieChart
+  Users, Download, Plus, Search, Settings, FileText, LayoutGrid, 
+  CreditCard, Bell, ChevronDown, MoreHorizontal, ArrowUpRight
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Page } from 'components/shared/Page';
 
 const MainDashboard = () => {
-  const [adminName, setAdminName] = useState("Admin");
-
-  useEffect(() => {
-    // Cookie से एडमिन का नाम निकालने का फंक्शन
-    const getCookie = (name) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop().split(';').shift();
-      return null;
-    };
-
-    const fullName = getCookie('name');
-    if (fullName) {
-      const decodedName = decodeURIComponent(fullName);
-      setAdminName(decodedName.split(' ')[0]); // केवल फ़र्स्ट नेम डिस्प्ले करने के लिए
-    }
-  }, []);
-
   // 1. Core Analytics Summary Cards
   const summaryCards = [
-    { title: "Total Enrolled Students", value: "3,842", icon: Users, change: "+14% this month", color: "text-[#3567AE]", bg: "bg-[#3567AE]/5" },
-    { title: "Active Test Series", value: "118", icon: FileText, change: "+8 new live", color: "text-red-600", bg: "bg-red-50" },
-    { title: "Total Courses Published", value: "14", icon: PlayCircle, change: "2 Streams (MPSC/UPSC)", color: "text-emerald-600", bg: "bg-emerald-50" },
-    { title: "Monthly Revenue", value: "₹4,82,900", icon: IndianRupee, change: "+22% growth", color: "text-amber-600", bg: "bg-amber-50" }
+    { title: "MRR", value: "₹18.4L", icon: "text-slate-400", change: "+12.4% MoM", isPositive: true },
+    { title: "ACTIVE USERS", value: "2,40,128", icon: Users, change: "+8,420 / wk", isPositive: true },
+    { title: "TESTS LIVE", value: "642", icon: FileText, change: "12 drafts", isPositive: true },
+    { title: "PRO CONVERSIONS", value: "9.8%", icon: ArrowUpRight, change: "+1.2%", isPositive: true }
   ];
 
-  // 2. Recent Test Attempts / Activities
-  const recentActivities = [
-    { id: 1, candidate: "Rahul Deshmukh", test: "MPSC State Services Prelims - Mock 1", score: "142/200", status: "Passed", time: "10 mins ago" },
-    { id: 2, candidate: "Priya Patil", test: "UPSC CSAT Sectional - Aptitude II", score: "88/200", status: "Review Required", time: "25 mins ago" },
-    { id: 3, candidate: "Aniket Shinde", test: "STI/PSI Combined Group B Prelims", score: "112/200", status: "Passed", time: "1 hour ago" },
-    { id: 4, candidate: "Snehal Joshi", test: "MPSC Rajyaseva Daily CA Quiz", score: "45/50", status: "Passed", time: "2 hours ago" }
+  // 2. Recent Users Data
+  const recentUsers = [
+    { id: 1, name: "Priya Menon", email: "priya@mail.in", exam: "UPSC CSE", plan: "Yearly Pro", planBg: "bg-orange-50 text-orange-600", tests: "64", joined: "12 May", status: "active" },
+    { id: 2, name: "Karan Soni", email: "karan@mail.in", exam: "MPSC", plan: "Monthly", planBg: "bg-orange-50 text-orange-600", tests: "22", joined: "18 May", status: "active" },
+    { id: 3, name: "Devika Rao", email: "devika@mail.in", exam: "UPSC CSE", plan: "Free", planBg: "bg-slate-50 text-slate-600", tests: "8", joined: "21 May", status: "trial" },
+    { id: 4, name: "Imran Khan", email: "imran@mail.in", exam: "SSC CGL", plan: "Monthly", planBg: "bg-orange-50 text-orange-600", tests: "41", joined: "23 May", status: "active" },
+    { id: 5, name: "Sneha Iyer", email: "sneha@mail.in", exam: "UPPCS", plan: "Yearly Pro", planBg: "bg-orange-50 text-orange-600", tests: "88", joined: "24 May", status: "active" }
   ];
 
-  // 3. Course Enrollment Breakdown Data
-  const streamDistribution = [
-    { name: "MPSC State Services", value: 55, color: "#3567AE" }, // Royal Blue
-    { name: "UPSC Civil Services", value: 30, color: "#DC2626" },   // Crimson Red
-    { name: "Combined Group B/C", value: 15, color: "#10B981" }
+  // 3. Plan Mix Data
+  const planMix = [
+    { name: "Free", value: 72, color: "bg-slate-700" },      
+    { name: "Monthly Pro", value: 18, color: "bg-[#F5A524]" },    
+    { name: "Yearly Pro", value: 10, color: "bg-[#F5A524]" }     
   ];
 
-  const weeklySignups = [120, 145, 190, 165, 210, 240, 185];
+  // 4. Revenue Data (Simulating the stacked look)
+  // Each month has a 'total' height (gray background) and an 'achieved' height (orange foreground)
+  const revenueData = [
+    { month: 'A', total: 60, achieved: 40 },
+    { month: 'S', total: 70, achieved: 45 },
+    { month: 'O', total: 80, achieved: 55 },
+    { month: 'N', total: 100, achieved: 65 },
+    { month: 'D', total: 110, achieved: 75 },
+    { month: 'J', total: 120, achieved: 80 },
+    { month: 'F', total: 130, achieved: 85 },
+    { month: 'M', total: 140, achieved: 95 },
+    { month: 'A', total: 150, achieved: 105 },
+    { month: 'M', total: 160, achieved: 120 },
+    { month: 'J', total: 170, achieved: 135 },
+    { month: 'J', total: 180, achieved: 150 },
+  ];
 
   // Framer Motion Animation Settings
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.06 } }
+    visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
   };
 
   const itemVariants = {
-    hidden: { y: 12, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { duration: 0.35, ease: "easeOut" } }
+    hidden: { y: 10, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.3, ease: "easeOut" } }
   };
 
   return (
-    <Page title="Management Dashboard">
+    <div className="min-h-screen bg-white">
+      
+      {/* Top Secondary Navigation Tabs */}
+      <div className="border-b border-slate-100 bg-white sticky top-0 z-30 pt-3 pb-3 px-6 md:px-8">
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar max-w-[1600px] mx-auto">
+          <button className="flex items-center gap-2 bg-[#0A0E17] text-white px-4 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap">
+            <LayoutGrid size={14} /> Overview
+          </button>
+          <button className="flex items-center gap-2 text-slate-600 hover:bg-slate-50 px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors whitespace-nowrap">
+            <Users size={14} /> Users
+          </button>
+          <button className="flex items-center gap-2 text-slate-600 hover:bg-slate-50 px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors whitespace-nowrap">
+            <FileText size={14} /> Mock Tests
+          </button>
+          <button className="flex items-center gap-2 text-slate-600 hover:bg-slate-50 px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors whitespace-nowrap">
+            <FileText size={14} /> Question Bank
+          </button>
+          <button className="flex items-center gap-2 text-slate-600 hover:bg-slate-50 px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors whitespace-nowrap">
+            <Users size={14} /> Exams & Courses
+          </button>
+          <button className="flex items-center gap-2 text-slate-600 hover:bg-slate-50 px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors whitespace-nowrap">
+            <CreditCard size={14} /> Payments
+          </button>
+          <button className="flex items-center gap-2 text-slate-600 hover:bg-slate-50 px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors whitespace-nowrap">
+            <Bell size={14} /> Notifications
+          </button>
+          <button className="flex items-center gap-2 text-slate-600 hover:bg-slate-50 px-4 py-1.5 rounded-full text-[13px] font-medium transition-colors whitespace-nowrap">
+            <Settings size={14} /> Settings
+          </button>
+        </div>
+      </div>
+
       <motion.div 
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="min-h-screen bg-[#f8fafc]"
+        className="pb-12 bg-slate-50/30"
       >
-        <div className="p-6 max-w-[1600px] mx-auto space-y-6">
+        <div className="p-6 md:p-8 max-w-[1600px] mx-auto space-y-6">
           
           {/* ⭐ Top Header Section */}
-          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-2">
             <div>
-              <h1 className="text-xl font-black text-gray-900 tracking-tight uppercase">
-                Welcome back, {adminName} 
-              </h1>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Here is the current live status of your MPSC & UPSC online test series portal.
+              <p className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-1.5">
+                Admin Console
               </p>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+                Operations overview
+              </h1>
             </div>
-            <div className="flex gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider">
-              <Calendar size={14} className="mt-0.5" /> Date: {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+            
+            <div className="flex items-center gap-3">
+              <button className="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-xl font-semibold text-sm transition-all shadow-sm">
+                <Download size={16} />
+                Export
+              </button>
+              <button className="flex items-center gap-1.5 bg-[#F5A524] hover:bg-[#e09621] text-black px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-sm">
+                <Plus size={16} strokeWidth={2.5} />
+                New question
+              </button>
             </div>
           </motion.div>
 
           {/* ⭐ 4 Columns Analytics Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
             {summaryCards.map((card, idx) => (
               <motion.div 
                 key={idx} 
                 variants={itemVariants}
-                whileHover={{ y: -3 }}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col justify-between"
+                className="bg-white rounded-[20px] border border-slate-200/60 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] p-6 flex flex-col relative overflow-hidden"
               >
-                <div className="flex items-center justify-between">
-                  <div className={`${card.bg} p-2.5 rounded-xl`}>
-                    <card.icon size={20} className={card.color} />
-                  </div>
-                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-0.5">
-                    <TrendingUp size={10} /> {card.change}
-                  </span>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">{card.title}</p>
+                  {typeof card.icon === 'string' ? (
+                    <span className="text-slate-400 text-sm font-semibold">$</span>
+                  ) : (
+                    <card.icon size={16} className="text-slate-400" />
+                  )}
                 </div>
-                <div className="mt-4">
-                  <p className="text-gray-400 font-bold text-xs uppercase tracking-wider">{card.title}</p>
-                  <p className="text-2xl font-black text-slate-800 tracking-tight mt-0.5">{card.value}</p>
+                <div>
+                  <h3 className="text-[28px] font-bold text-slate-900 tracking-tight leading-none mb-2">{card.value}</h3>
+                  <p className="text-[13px] font-bold text-emerald-600">{card.change}</p>
                 </div>
               </motion.div>
             ))}
           </div>
 
           {/* ⭐ Charts Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             
-            {/* Weekly Student Registrations (2 Columns wide) */}
-            <motion.div variants={itemVariants} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 lg:col-span-2">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-[#3567AE]/5 rounded-xl">
-                    <BarChart3 size={18} className="text-[#3567AE]" />
-                  </div>
-                  <h3 className="font-black tracking-tight text-slate-800 text-sm uppercase">Weekly Student Signups</h3>
+            {/* Revenue · last 12 months */}
+            <motion.div variants={itemVariants} className="bg-white rounded-[20px] border border-slate-200/60 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] p-6 lg:col-span-2">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="font-bold tracking-tight text-slate-900 text-[17px]">Revenue · last 12 months</h3>
+                <div className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors">
+                  <span className="text-xs font-bold text-slate-700">FY 2025-26</span>
+                  <ChevronDown size={14} className="text-slate-400" />
                 </div>
-                <span className="text-xs font-bold text-gray-400">Last 7 days registration metrics</span>
               </div>
               
-              <div className="flex items-end gap-3 h-44 pt-4 px-2">
-                {weeklySignups.map((value, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                    <div className="w-full bg-slate-50 rounded-t-lg h-[120px] flex items-end">
+              <div className="flex items-end justify-between h-56 pt-4 px-2">
+                {revenueData.map((data, i) => (
+                  <div key={i} className="flex flex-col items-center gap-3 w-full group">
+                    <div className="w-[80%] max-w-[40px] h-[180px] flex items-end relative">
+                      {/* Gray Background Bar */}
+                      <div 
+                        className="absolute bottom-0 w-full bg-slate-200 rounded-t-md transition-all duration-300"
+                        style={{ height: `${(data.total / 200) * 180}px` }}
+                      ></div>
+                      {/* Orange Foreground Bar */}
                       <motion.div 
                         initial={{ height: 0 }}
-                        animate={{ height: `${(value / 250) * 120}px` }}
-                        transition={{ duration: 0.7, delay: i * 0.04 }}
-                        className="w-full bg-gradient-to-t from-[#3567AE] to-[#5185cf] rounded-t-lg hover:opacity-95 cursor-pointer"
+                        animate={{ height: `${(data.achieved / 200) * 180}px` }}
+                        transition={{ duration: 0.8, delay: i * 0.04 }}
+                        className="absolute bottom-0 w-full bg-[#F5A524] rounded-t-md shadow-sm transition-all duration-300 group-hover:brightness-110"
                       />
                     </div>
-                    <span className="text-[10px] text-gray-400 font-bold">
-                      {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}
+                    <span className="text-[11px] text-slate-500 font-bold uppercase">
+                      {data.month}
                     </span>
                   </div>
                 ))}
               </div>
             </motion.div>
 
-            {/* Course Streams Distribution Pie (1 Column wide) */}
-            <motion.div variants={itemVariants} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-red-50 rounded-xl">
-                    <PieChart size={18} className="text-red-600" />
-                  </div>
-                  <h3 className="font-black tracking-tight text-slate-800 text-sm uppercase">Stream Distribution</h3>
-                </div>
-              </div>
+            {/* Plan Mix */}
+            <motion.div variants={itemVariants} className="flex flex-col gap-5">
               
-              <div className="flex flex-col sm:flex-row lg:flex-col gap-6 items-center pt-2">
-                {/* SVG Semi-Pie Generator */}
-                <div className="relative w-28 h-28 shrink-0">
-                  <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                    {(() => {
-                      let cumulative = 0;
-                      return streamDistribution.map((stream, idx) => {
-                        const percentage = stream.value;
-                        const startAngle = cumulative * 3.6;
-                        const endAngle = (cumulative + percentage) * 3.6;
-                        cumulative += percentage;
-                        const startRad = (startAngle * Math.PI) / 180;
-                        const endRad = (endAngle * Math.PI) / 180;
-                        const x1 = 50 + 40 * Math.cos(startRad);
-                        const y1 = 50 + 40 * Math.sin(startRad);
-                        const x2 = 50 + 40 * Math.cos(endRad);
-                        const y2 = 50 + 40 * Math.sin(endRad);
-                        const largeArc = percentage > 50 ? 1 : 0;
-                        return (
-                          <path
-                            key={idx}
-                            d={`M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArc} 1 ${x2} ${y2} Z`}
-                            fill={stream.color}
-                            className="transition-all duration-200 hover:opacity-90"
-                          />
-                        );
-                      });
-                    })()}
-                    <circle cx="50" cy="50" r="24" fill="white" />
-                  </svg>
-                </div>
+              {/* Plan mix card */}
+              <div className="bg-white rounded-[20px] border border-slate-200/60 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] p-6 flex-1">
+                <h3 className="font-bold tracking-tight text-slate-900 text-[17px] mb-6">Plan mix</h3>
                 
-                <div className="w-full space-y-2">
-                  {streamDistribution.map((stream, idx) => (
-                    <div key={idx} className="flex items-center justify-between text-xs font-bold">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: stream.color }} />
-                        <span className="text-slate-500 font-semibold">{stream.name}</span>
+                <div className="space-y-6">
+                  {planMix.map((plan, idx) => (
+                    <div key={idx} className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="font-semibold text-slate-700">{plan.name}</span>
+                        <span className="font-bold text-slate-900">{plan.value}%</span>
                       </div>
-                      <span className="text-slate-700">{stream.value}%</span>
+                      <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${plan.value}%` }}
+                          transition={{ duration: 0.8, delay: idx * 0.1 }}
+                          className={`h-full rounded-full ${plan.color}`}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
+
+              {/* AVG LTV Card */}
+              <div className="bg-[#FFF6ED] rounded-[20px] border border-orange-100/50 p-6">
+                <p className="text-[11px] font-bold text-orange-500/80 uppercase tracking-widest mb-1">AVG LTV</p>
+                <h3 className="text-3xl font-black text-slate-900 tracking-tight">₹2,840</h3>
+              </div>
+              
             </motion.div>
           </div>
 
-          {/* ⭐ Recent Activity & Evaluation Logs */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-emerald-50 rounded-xl text-emerald-600"><Award size={18} /></div>
-                <h3 className="font-black tracking-tight text-slate-800 text-sm uppercase">Recent Test Submissions</h3>
-              </div>
-              <button className="text-xs text-[#3567AE] hover:underline font-bold flex items-center gap-0.5">
-                View Evaluation Logs <ChevronRight size={14} />
+          {/* ⭐ Recent Users List */}
+          <motion.div variants={itemVariants} className="bg-white rounded-[20px] border border-slate-200/60 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] overflow-hidden">
+            <div className="px-6 py-5 flex items-center justify-between">
+              <h3 className="font-bold tracking-tight text-slate-900 text-[17px]">Recent users</h3>
+              <button className="text-xs font-bold text-slate-600 hover:text-slate-900 transition-colors">
+                Manage all
               </button>
             </div>
             
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-gray-100 bg-slate-50/60 text-[10px] font-black uppercase tracking-wider text-gray-400">
-                    <th className="p-4">Candidate Student</th>
-                    <th className="p-4">Attempted Test Module</th>
-                    <th className="p-4">Secured Score</th>
-                    <th className="p-4">Status Log</th>
-                    <th className="p-4 text-right">Time</th>
+                  <tr className="border-y border-slate-100 bg-white text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                    <th className="px-6 py-4">USER</th>
+                    <th className="px-6 py-4">EXAM</th>
+                    <th className="px-6 py-4">PLAN</th>
+                    <th className="px-6 py-4">TESTS</th>
+                    <th className="px-6 py-4">JOINED</th>
+                    <th className="px-6 py-4">STATUS</th>
+                    <th className="px-6 py-4 text-right"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50 text-xs font-bold">
-                  {recentActivities.map((log) => (
-                    <tr key={log.id} className="hover:bg-slate-50/40 transition-colors">
-                      <td className="p-4 text-slate-800">{log.candidate}</td>
-                      <td className="p-4 text-gray-500 font-semibold">{log.test}</td>
-                      <td className="p-4 text-slate-700 font-extrabold">{log.score}</td>
-                      <td className="p-4">
-                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] ${log.status === 'Passed' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
-                          <span className={`h-1 w-1 rounded-full ${log.status === 'Passed' ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                          {log.status}
+                <tbody className="divide-y divide-slate-100 text-[13px]">
+                  {recentUsers.map((user) => (
+                    <tr key={user.id} className="hover:bg-slate-50/50 transition-colors group">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-[34px] w-[34px] rounded-full bg-[#0A0E17] text-white flex items-center justify-center font-bold text-xs uppercase shadow-sm">
+                            {user.name.charAt(0)}
+                          </div>
+                          <div className="leading-tight">
+                            <p className="font-bold text-slate-900">{user.name}</p>
+                            <p className="text-[12px] text-slate-500 font-medium">{user.email}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-slate-700">{user.exam}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold ${user.planBg}`}>
+                          {user.plan}
                         </span>
                       </td>
-                      <td className="p-4 text-right text-gray-400 font-semibold">{log.time}</td>
+                      <td className="px-6 py-4 font-black text-slate-900">{user.tests}</td>
+                      <td className="px-6 py-4 font-medium text-slate-500">{user.joined}</td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center gap-1.5 font-bold text-slate-700 text-xs">
+                          <span className={`h-1.5 w-1.5 rounded-full ${user.status === 'active' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                          {user.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors">
+                          <MoreHorizontal size={16} />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </div>
+          </motion.div>
 
         </div>
       </motion.div>
-    </Page>
+    </div>
   );
 };
 

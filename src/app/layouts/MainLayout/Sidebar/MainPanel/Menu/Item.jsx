@@ -32,10 +32,10 @@ export function Item({
         "data-tooltip-place": "right",
       }}
       className={clsx(
-        "relative flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg outline-hidden transition-colors duration-200",
+        "relative flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl outline-hidden transition-all duration-200",
         isActive
-          ? " text-[#2A5589]"
-          : "text-gray-500 hover:text-[#2A5589] ",
+          ? "bg-[#F5A524] text-[#0A0E17] shadow-sm"
+          : "text-slate-400 hover:bg-[#1E293B]/50 hover:text-white",
       )}
       onKeyDown={createScopedKeydownHandler({
         siblingSelector: "[data-root-menu-item]",
@@ -48,7 +48,7 @@ export function Item({
       {...rest}
     >
       {Icon && (
-        <Icon className="size-7 transition-colors duration-300" />
+        <Icon className="size-6 transition-colors duration-300" />
       )}
 
       {info && info.val && (

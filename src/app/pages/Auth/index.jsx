@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LockClosedIcon, UserIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { AcademicCapIcon } from "@heroicons/react/24/solid";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,8 +12,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import app from "configs/firebaseconfig";
 
 // --- Local & Custom In-built UI Imports ---
-import Logo from "assets/logo.png"; 
-import { Button, Input } from "components/ui"; // आपके इन-बिल्ट UI कॉम्पोनेंट्स
+import { Button, Input } from "components/ui"; 
 import { useAuthContext } from "app/contexts/auth/context";
 import { schema } from "./schema";
 import { Page } from "components/shared/Page";
@@ -90,69 +90,96 @@ export default function SignIn() {
 
   return (
     <Page title="Admin Login">
-      <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_center,_#ffffff_0%,_#f0f4f9_50%,_#e8eff9_100%)]">
-        {/* Background Decorative Dots */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(53,103,174,0.08)_1px,transparent_1px)] [background-size:32px_32px] opacity-70" />
+      <main className="min-h-screen flex w-full bg-white">
+        
+        {/* LEFT SIDE: Brand Presentation (Hidden on small screens) */}
+        <div className="hidden lg:flex w-1/2 bg-[#0A0E17] flex-col justify-between p-12 relative overflow-hidden">
+          {/* Subtle Background Pattern */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(245,165,36,0.05)_1px,transparent_1px)] [background-size:24px_24px] opacity-60" />
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5A524] shadow-lg">
+                <AcademicCapIcon className="h-6 w-6 text-[#0A0E17]" />
+              </div>
+              <span className="text-xl font-bold tracking-wide text-white">Mock Test</span>
+            </div>
+          </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="relative z-10 w-full max-w-[460px] px-4"
-        >
-          {/* Glassmorphism Card */}
-          <div className="rounded-3xl border border-[var(--app-login-border-color2)] bg-[var(--app-login-card-bg-color1)] p-8 shadow-[0_20px_50px_rgba(53,103,174,0.1)] backdrop-blur-xl">
-            
-            {/* Logo Section */}
-            <div className="mb-6 flex flex-col items-center">
-              <motion.div 
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.7 }}
-                className="mb-3 h-20 w-20 overflow-hidden rounded-full bg-[var(--app-bg-color2)] p-1 shadow-md flex items-center justify-center"
-              >
-                <img src={Logo} alt="SR Logo" className="h-full w-full object-contain" />
-              </motion.div>
-              <h2 className="text-2xl font-black tracking-tight text-[var(--app-text-color1)] text-center">
-                MPSC UPSC TEST
+          <div className="relative z-10 max-w-md">
+            <h1 className="text-4xl font-black text-white leading-tight mb-4">
+              Empowering your <span className="text-[#F5A524]">preparation</span> journey.
+            </h1>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Access comprehensive test series, track your progress with advanced analytics, and achieve your goals with our industry-leading preparation platform.
+            </p>
+          </div>
+
+          <div className="relative z-10 flex items-center gap-4 text-sm font-semibold text-slate-500">
+            <p>© {new Date().getFullYear()} Mock Test Portal.</p>
+            <div className="h-4 w-px bg-slate-700" />
+            <p>All rights reserved.</p>
+          </div>
+        </div>
+
+        {/* RIGHT SIDE: Login Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative">
+          
+          {/* Mobile Logo (Visible only on small screens) */}
+          <div className="absolute top-8 left-6 sm:left-12 flex lg:hidden items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5A524]">
+              <AcademicCapIcon className="h-5 w-5 text-[#0A0E17]" />
+            </div>
+            <span className="text-lg font-bold tracking-wide text-slate-900">Mock Test</span>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-[420px]"
+          >
+            <div className="mb-10">
+              <h2 className="text-3xl font-black tracking-tight text-slate-900 mb-2">
+                Welcome back
               </h2>
-              <p className="text-xs font-bold uppercase tracking-widest text-[var(--app-text-color2)] mt-1">
-                Management Portal
+              <p className="text-sm font-medium text-slate-500">
+                Please enter your credentials to access the admin portal.
               </p>
             </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               
-              {/* Username Input - Focused to Royal Blue */}
-              <div>
-                <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-[var(--app-text-color3)] ml-1">Username</label>
+              {/* Username Input */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Username</label>
                 <Input
-                  placeholder="Enter username"
-                  className="h-12 rounded-xl border border-gray-200 bg-white/90 text-[var(--app-text-color4)] transition-all focus:border-orange-600 focus:ring-0"
-                  prefix={<UserIcon className="size-5 text-gray-400" />}
+                  placeholder="Enter your username"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-slate-900 transition-all focus:border-[#F5A524] focus:bg-white focus:ring-4 focus:ring-[#F5A524]/10"
+                  prefix={<UserIcon className="size-5 text-slate-400" />}
                   {...register("username")}
                   error={errors?.username?.message}
                 />
               </div>
 
-              {/* Password Input - Focused to Royal Blue */}
-              <div>
-                <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-[var(--app-text-color3)] ml-1">Password</label>
+              {/* Password Input */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Password</label>
                 <Input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter password"
-                  className="h-12 rounded-xl border border-gray-200 bg-white/90 text-[var(--app-text-color4)] transition-all focus:border-orange-600 focus:ring-0"
-                  prefix={<LockClosedIcon className="size-5 text-gray-400" />}
+                  placeholder="Enter your password"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-slate-900 transition-all focus:border-[#F5A524] focus:bg-white focus:ring-4 focus:ring-[#F5A524]/10"
+                  prefix={<LockClosedIcon className="size-5 text-slate-400" />}
                   suffix={
                     <button
                       type="button"
-                      className="transition-colors hover:text-[var(--app-text-color1)]"
+                      className="transition-colors hover:text-slate-700"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeSlashIcon className="size-5 text-gray-400" />
+                        <EyeSlashIcon className="size-5 text-slate-400" />
                       ) : (
-                        <EyeIcon className="size-5 text-gray-400" />
+                        <EyeIcon className="size-5 text-slate-400" />
                       )}
                     </button>
                   }
@@ -162,21 +189,21 @@ export default function SignIn() {
               </div>
 
               {/* Submit Button */}
-              <div className="pt-2">
+              <div className="pt-4">
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="h-12 w-full rounded-xl bg-red-600 text-sm font-bold tracking-widest text-white transition-all hover:bg-red-700 active:scale-[0.99] disabled:opacity-70 shadow-lg shadow-red-600/20"
+                  className="h-12 w-full rounded-xl bg-[#F5A524] text-sm font-bold text-[#0A0E17] transition-all hover:bg-[#e09621] active:scale-[0.99] disabled:opacity-70 shadow-lg shadow-[#F5A524]/20"
                 >
                   {isLoading ? "SIGNING IN..." : "SIGN IN"}
                 </Button>
               </div>
 
               {/* Divider */}
-              <div className="flex items-center gap-4 py-1">
-                <div className="h-[1px] flex-1 bg-gray-200" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">or continue with</span>
-                <div className="h-[1px] flex-1 bg-gray-200" />
+              <div className="flex items-center gap-4 py-3">
+                <div className="h-[1px] flex-1 bg-slate-200" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">or</span>
+                <div className="h-[1px] flex-1 bg-slate-200" />
               </div>
 
               {/* Google Button */}
@@ -185,14 +212,14 @@ export default function SignIn() {
                 whileTap={{ scale: 0.99 }}
                 type="button"
                 onClick={handleGoogleSignIn}
-                className="flex h-12 w-full items-center justify-center rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-600 shadow-sm transition-all hover:border-gray-300 hover:bg-gray-50"
+                className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50"
               >
                 <GoogleIcon />
-                <span>Google Account</span>
+                <span>Continue with Google</span>
               </motion.button>
             </form>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
 
         {/* --- Full Screen Loader --- */}
         <AnimatePresence>
@@ -201,20 +228,15 @@ export default function SignIn() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white/80 backdrop-blur-md"
+              className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0A0E17]/80 backdrop-blur-md"
             >
               <div className="relative flex flex-col items-center">
-                <div className="h-20 w-20 animate-spin rounded-full border-4 border-gray-100 border-t-red-500" />
-                <motion.img 
-                  src={Logo} 
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: [0.8, 1, 0.8] }}
-                  transition={{ repeat: Infinity, duration: 1.5 }}
-                  className="absolute top-5 h-10 w-10 object-contain" 
-                  alt="Loading..."
-                />
-                <p className="mt-6 font-bold tracking-[0.2em] text-gray-800 animate-pulse text-xs">
-                  Loading...
+                <div className="h-16 w-16 animate-spin rounded-full border-4 border-slate-700 border-t-[#F5A524]" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <AcademicCapIcon className="h-6 w-6 text-[#F5A524]" />
+                </div>
+                <p className="mt-6 font-bold tracking-widest text-[#F5A524] animate-pulse text-xs uppercase">
+                  Authenticating
                 </p>
               </div>
             </motion.div>

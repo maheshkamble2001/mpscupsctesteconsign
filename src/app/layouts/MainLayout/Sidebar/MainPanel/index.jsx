@@ -20,13 +20,13 @@ export function MainPanel({ nav, setActiveSegment, activeSegment }) {
     <div className="main-panel">
       <div
         className={clsx(
-          "bg-white flex h-full w-full flex-col items-center border-r border-gray-200",
+          "bg-[#0A0E17] flex h-full w-full flex-col items-center border-r border-[#1E293B]/50",
         )}
       >
         {/* Application Logo */}
-        <div className="flex h-15 w-full items-center justify-center border-b border-gray-100 rounded-b-xl">
-          <Link to="/">
-            <img src={Logo} alt="App Logo" className="size-12" />
+        <div className="flex h-20 w-full items-center justify-center mt-2">
+          <Link to="/" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#F5A524] transition-transform duration-300 hover:scale-105">
+            <img src={Logo} alt="App Logo" className="h-7 w-7 object-contain brightness-0 invert" />
           </Link>
         </div>
 

@@ -8,7 +8,7 @@ import {
   ChevronDown,
   Search as SearchIcon,
   Command,
-  Sparkles
+  Bell
 } from "lucide-react";
 import {
   Popover,
@@ -57,28 +57,25 @@ export function Header() {
   return (
     <header
       className={clsx(
-        "app-header sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between px-6 transition-all duration-300",
-        "border-b border-slate-100 bg-white/80 backdrop-blur-md dark:border-slate-800/60 dark:bg-slate-900/80"
+        "app-header sticky top-0 z-40 flex h-20 shrink-0 items-center justify-between px-6 transition-all duration-300",
+        "border-b border-slate-200/70 bg-white/80 backdrop-blur-xl dark:border-slate-800 dark:bg-[#0A0E17]/80"
       )}
     >
       {/* --- LEFT: Brand Identity & Greeting --- */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-5">
         <SidebarToggleBtn />
 
         {smAndUp && (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-5">
             {/* Elegant Vertical Divider Hairline */}
-            <div className="h-5 w-px bg-slate-200/80 dark:bg-slate-800" />
+            <div className="h-8 w-px bg-slate-200 dark:bg-slate-800" />
             
-            <div className="flex flex-col leading-normal">
-              <div className="flex items-center gap-1.5">
-                <Sparkles size={11} className="text-primary/70 dark:text-primary/90" />
-                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  {timeGreeting}
-                </span>
-              </div>
-              <h1 className="text-[13px] font-bold tracking-tight text-slate-800 dark:text-slate-100">
-                Welcome, <span className="text-slate-900 dark:text-white font-extrabold">{firstName}</span>
+            <div className="flex flex-col leading-tight">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-0.5">
+                {timeGreeting}
+              </span>
+              <h1 className="text-[15px] font-medium tracking-tight text-slate-600 dark:text-slate-300">
+                Welcome back, <span className="text-slate-900 dark:text-white font-bold">{firstName}</span> 👋
               </h1>
             </div>
           </div>
@@ -87,17 +84,17 @@ export function Header() {
 
       {/* --- CENTER: Minimalist Search Workspace --- */}
       {mdAndUp && (
-        <div className="mx-4 flex-1 max-w-[280px]">
+        <div className="mx-4 flex-1 max-w-[400px]">
           <Search
             renderButton={(open) => (
               <button
                 onClick={open}
-                className="group flex w-full items-center gap-2.5 rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-1.5 transition-all hover:bg-slate-50 hover:border-slate-200/80 dark:border-slate-800/40 dark:bg-slate-950/20 dark:hover:bg-slate-950/40"
+                className="group flex w-full items-center gap-3 rounded-full border border-slate-200/60 bg-slate-50/80 px-4 py-2.5 transition-all hover:bg-slate-100 hover:border-slate-300 dark:border-slate-700/60 dark:bg-slate-800/50 dark:hover:bg-slate-800"
               >
-                <SearchIcon size={13} className="text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
-                <span className="text-xs font-medium text-slate-400 group-hover:text-slate-500 dark:group-hover:text-slate-400">Search Workspace...</span>
-                <div className="ml-auto flex items-center gap-0.5 rounded-md border border-slate-200/60 bg-white px-1.5 py-0.5 text-[9px] font-bold text-slate-400 dark:border-slate-800 dark:bg-slate-900 transition-colors">
-                  <Command size={9} />
+                <SearchIcon size={16} className="text-slate-400 group-hover:text-slate-500 dark:group-hover:text-slate-300 transition-colors" />
+                <span className="text-[13px] font-medium text-slate-400 group-hover:text-slate-500 dark:group-hover:text-slate-400">Search everywhere...</span>
+                <div className="ml-auto flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-bold text-slate-400 shadow-sm dark:border-slate-700 dark:bg-slate-900 transition-colors">
+                  <Command size={10} />
                   <span>K</span>
                 </div>
               </button>
@@ -107,64 +104,74 @@ export function Header() {
       )}
 
       {/* --- RIGHT: Sharp Popover Admin Hub --- */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
+        
+        {/* Notification Bell */}
+        <button className="relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/60 bg-slate-50 text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200">
+          <Bell size={18} />
+          <span className="absolute right-2.5 top-2.5 flex h-2 w-2 rounded-full bg-[#F5A524] ring-2 ring-white dark:ring-slate-900"></span>
+        </button>
+
+        <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
+
         <Popover className="relative">
-          <PopoverButton className="group flex items-center gap-2.5 rounded-xl p-1.5 transition-all outline-none hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
+          <PopoverButton className="group flex items-center gap-3 rounded-full p-1 pr-3 transition-all outline-none hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
             
             {/* Elegant Frameless Letter Avatar matching PrimePanel logic */}
-            <div className="flex size-8.5 items-center justify-center rounded-lg bg-slate-50 border border-slate-100 text-xs font-bold tracking-tight text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 shadow-xs transition-all group-hover:bg-primary/5 group-hover:border-primary/20 group-hover:text-primary">
+            <div className="flex size-9 items-center justify-center rounded-full bg-[#F5A524] text-[13px] font-bold tracking-tight text-[#0A0E17] shadow-sm transition-transform duration-300 group-hover:scale-105">
               {initials}
             </div>
             
             {/* Admin Info text labels */}
             <div className="hidden flex-col items-start lg:flex text-left leading-tight">
-              <div className="flex items-center gap-1">
-                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 tracking-tight transition-colors group-hover:text-slate-900 dark:group-hover:text-white">
-                  {name}
-                </span>
-                <ChevronDown size={11} className="text-slate-400 transition-transform duration-200 group-hover:translate-y-0.5" />
-              </div>
-              <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-0.5">
+              <span className="text-[13px] font-bold text-slate-800 dark:text-slate-200 tracking-tight transition-colors group-hover:text-slate-900 dark:group-hover:text-white">
+                {name}
+              </span>
+              <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-0.5">
                 {role}
               </span>
             </div>
+            
+            <ChevronDown size={14} className="ml-1 text-slate-400 transition-transform duration-200 group-hover:translate-y-0.5 hidden lg:block" />
           </PopoverButton>
 
           {/* Smooth Transition for Popover panel dropdown */}
           <Transition
             as={Fragment}
             enter="transition duration-200 ease-out"
-            enterFrom="opacity-0 translate-y-1.5 scale-98"
+            enterFrom="opacity-0 translate-y-2 scale-95"
             enterTo="opacity-100 translate-y-0 scale-100"
             leave="transition duration-100 ease-in"
             leaveFrom="opacity-100 translate-y-0 scale-100"
-            leaveTo="opacity-0 translate-y-1.5 scale-98"
+            leaveTo="opacity-0 translate-y-2 scale-95"
           >
-            <PopoverPanel className="absolute right-0 mt-2 w-52 origin-top-right overflow-hidden rounded-xl border border-slate-100 bg-white p-1 shadow-[0_12px_30px_rgba(0,0,0,0.04)] dark:border-slate-800 dark:bg-slate-900">
+            <PopoverPanel className="absolute right-0 mt-3 w-56 origin-top-right overflow-hidden rounded-2xl border border-slate-100 bg-white p-1.5 shadow-xl dark:border-slate-800 dark:bg-[#0A0E17]">
               
               {/* Context user info container */}
-              <div className="px-3 py-2 mb-1 bg-slate-50/60 dark:bg-slate-950/40 rounded-lg">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Active Session</p>
-                <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">{name}</p>
+              <div className="px-4 py-3 mb-1 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Active Session</p>
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{name}</p>
               </div>
               
-              {/* Settings Action Link */}
-              <Link
-                to="/settings/general"
-                className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs+ font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-200"
-              >
-                <Settings size={14} className="text-slate-400" />
-                <span>Settings</span>
-              </Link>
-              
-              {/* Sign Out Button */}
-              <button
-                onClick={logout}
-                className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-xs+ font-medium text-rose-600 transition-colors hover:bg-rose-50/50 dark:hover:bg-rose-500/10"
-              >
-                <LogOut size={14} />
-                <span>Sign Out</span>
-              </button>
+              <div className="space-y-0.5 px-0.5 pt-1">
+                {/* Settings Action Link */}
+                <Link
+                  to="/settings/general"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/80 dark:hover:text-slate-200"
+                >
+                  <Settings size={16} className="text-slate-400" />
+                  <span>Account Settings</span>
+                </Link>
+                
+                {/* Sign Out Button */}
+                <button
+                  onClick={logout}
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-rose-600 transition-colors hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                >
+                  <LogOut size={16} />
+                  <span>Sign Out</span>
+                </button>
+              </div>
             </PopoverPanel>
           </Transition>
         </Popover>
