@@ -11,7 +11,6 @@ export function MenuItem({ data, className, hideIcon }) {
   const { lgAndDown } = useBreakpointsContext();
   const { close } = useSidebarContext();
   const title = t(transKey) || data.title;
-  console.log(hideIcon, "hideIcon prop in MenuItem",data);
 
   return (
     <NavLink

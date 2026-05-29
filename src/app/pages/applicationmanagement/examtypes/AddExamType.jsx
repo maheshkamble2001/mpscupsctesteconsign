@@ -18,7 +18,7 @@ import { toast } from "sonner";
 
 // UI Components
 import { Input, Button } from "components/ui";
-import { createExamType } from "api/applicationmanagement2/examtype";
+import { createExamType } from "api/applicationmanagement/examtype";
 
 export const AddExamType = ({ isOpen, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);

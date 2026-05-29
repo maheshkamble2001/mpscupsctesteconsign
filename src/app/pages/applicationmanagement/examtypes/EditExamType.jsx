@@ -16,7 +16,7 @@ import { toast } from "sonner";
 
 // Components & APIs
 import { Input, Button } from "components/ui";
-import { editExamType } from "api/applicationmanagement2/examtype";
+import { editExamType } from "api/applicationmanagement/examtype";
 // import { editExamType } from "api/usermanagement/examtypes";
 
 export const EditExamType = ({ isOpen, onClose, selectedExamType, onSuccess }) => {

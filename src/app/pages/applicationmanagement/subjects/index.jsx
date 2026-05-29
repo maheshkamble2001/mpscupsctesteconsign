@@ -15,33 +15,46 @@ import {
   PlusIcon,
   PencilIcon,
   TrashIcon,
-  MagnifyingGlassIcon,
-  XMarkIcon,
+  ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
+import { useNavigate } from "react-router-dom";
 
 // API calls
-import {
-  getSubjectsList,
-  // deleteSubject,
-} from "api/applicationmanagement/subject";
+import { getSubjectsList } from "api/applicationmanagement/subject";
 
-// Yaha humne modal ko import kar liya
+// Modals
 import { AddSubjectModal } from "./addstudent";
+import EditSubjectModal from "./editstudent";
+import { DeleteSubjectModal } from "./DeleteSubjectModal"; // ✅ Imported your clean delete modal component
 
-// UI & Components
+// UI Components
 import { Page } from "components/shared/Page";
+import { TableSkeleton } from "components/shared/TableSkeleton";
+import { GridSkeleton } from "components/shared/GridSkeleton";
 import PremiumEmptyState from "components/EmptyState/EmptyState";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@headlessui/react";
-import { Card } from "components/ui";
+import { Box, Card } from "components/ui";
 import { useLockScrollbar, useLocalStorage } from "hooks";
 import { fuzzyFilter } from "utils/react-table/fuzzyFilter";
 import { useSkipper } from "utils/react-table/useSkipper";
 import { PaginationSection } from "components/shared/table/PaginationSection";
-import { TableSkeleton } from "components/shared/TableSkeleton";
 import { ListView } from "components/tables/users-datatable/ListView";
-import EditSubjectModal from "./editstudent";
+
+// Utils
+import { verifyRole } from "utils/utilities";
+import { CustomToolbar } from "components/customs/CustomToolbar";
+
+const formatDate = (dateString) => {
+  if (!dateString) return "—";
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "—";
+    return `${date.getDate()} ${date.toLocaleString("default", { month: "short" })} ${date.getFullYear()}`;
+  } catch {
+    return "—";
+  }
+};
 
 const Subjects = () => {
   const navigate = useNavigate();
@@ -54,9 +67,7 @@ const Subjects = () => {
   const [limit, setLimit] = useState(10);
   const [searchText, setSearchText] = useState("");
   const [apiFailed, setApiFailed] = useState(false);
-  const [addModalOpen, setAddModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedEditSubject, setSelectedEditSubject] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
 
   const [tableSettings, setTableSettings] = useState({
     enableFullScreen: false,
@@ -67,21 +78,21 @@ const Subjects = () => {
 
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState([]);
-  const [columnVisibility, setColumnVisibility] = useLocalStorage(
-    "column-visibility-subjects",
-    {},
-  );
-  const [columnPinning, setColumnPinning] = useLocalStorage(
-    "column-pinning-subjects",
-    {},
-  );
+  const [viewType, setViewType] = useLocalStorage("exam-types-table-view-type", "list");
+  const [columnVisibility, setColumnVisibility] = useLocalStorage("column-visibility-subjects", {});
+  const [columnPinning, setColumnPinning] = useLocalStorage("column-pinning-subjects", {});
   const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
 
-  // Modal State
+  // Modal States
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
-  const [selectedId, setSelectedId] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedEditSubject, setSelectedEditSubject] = useState(null);
+  
+  // ✅ Track full subject details to feed the title text into confirm validation hooks
+  const [selectedDeleteSubject, setSelectedDeleteSubject] = useState(null);
 
+  // ---------------- FETCH DATA ----------------
   const fetchSubjects = useCallback(
     async (search = "", page = activePage, pageSize = limit) => {
       try {
@@ -91,42 +102,46 @@ const Subjects = () => {
 
         if (res.code === 200) {
           const rawData = res.data?.subjects || [];
-          const totalCount = res.data?.total || 0;
+          const totalCount = res.data?.pagination?.totalRecords || res.data?.total || 0;
 
           const transformed = rawData.map((item) => ({
-            subject_id: item.SubjectID,
-            subjectName: item.SubjectName || "-",
-            description: item.Description ? item.Description : "-",
-            status: item.Status,
-            addedOn: item.AddedOn,
+            subject_id: item.SubjectID || item.id,
+            subjectName: item.SubjectName || item.name || "-",
+            description: item.Description || item.description || "-",
+            status: item.Status ?? item.status ?? 1,
+            addedOn: item.AddedOn || item.addedOn || "",
           }));
 
           setTotal(totalCount);
           setSubjectList(transformed);
         } else {
           setSubjectList([]);
-          toast.error(res.message || "Failed to fetch subjects");
+          setTotal(0);
+          toast.error(res.message || "Failed to fetch subjects", { id: "fetch-subjects-error" });
           setApiFailed(true);
         }
       } catch (err) {
         console.error("Fetch subjects error:", err);
         setSubjectList([]);
-        toast.error("Something went wrong while fetching subjects");
+        setTotal(0);
+        toast.error("Something went wrong while fetching subjects", { id: "fetch-subjects-catch" });
         setApiFailed(true);
       } finally {
         setLoading(false);
+        setIsSearching(false);
       }
     },
-    [activePage, limit],
+    [activePage, limit]
   );
 
   useEffect(() => {
     fetchSubjects(searchText, activePage, limit);
   }, [fetchSubjects, searchText, activePage, limit]);
 
-  const handleSearchChange = (e) => {
-    setSearchText(e.target.value);
+  const handleSearch = (searchValue) => {
+    setSearchText(searchValue);
     setActivePage(1);
+    setIsSearching(true);
   };
 
   const handleLimitChange = (newLimit) => {
@@ -138,32 +153,34 @@ const Subjects = () => {
     setActivePage(newPage);
   };
 
-  const handleDeleteSubjectApi = async () => {
-    try {
-      setIsDeleting(true);
-      // const res = await deleteSubject({ id: selectedId }); // API un-comment kar lena
-      toast.success("Subject deleted successfully");
-      setDeleteModal(false);
-      await fetchSubjects(searchText, activePage, limit);
-    } catch {
-      toast.error("Something went wrong while deleting");
-    } finally {
-      setIsDeleting(false);
-    }
+  // ---------------- ACTION HANDLERS ----------------
+  const handleEditSubjectSuccess = () => {
+    fetchSubjects(searchText, activePage, limit);
+    setEditModalOpen(false);
+    setSelectedEditSubject(null);
+    navigate("?", { replace: true });
   };
 
-  // Table Columns Setup
+  // ✅ Triggered inside the clean ConfirmModal state flow wrapper directly on response code 200
+  const handleDeleteSubjectSuccess = () => {
+    fetchSubjects(searchText, activePage, limit);
+    setDeleteModal(false);
+    setSelectedDeleteSubject(null);
+  };
+
+  // ---------------- DEFINING TABLE COLUMNS ----------------
   const subjectColumns = [
     columnHelper.display({
       id: "serial_no",
       header: "Sr.No",
       cell: (info) => (
-        <div className="text-center font-medium">
+        <div className="font-medium">
           {info.row.index + 1 + (activePage - 1) * limit}
         </div>
       ),
     }),
     columnHelper.accessor("subjectName", {
+      id: "subjectName",
       header: "Subject Name",
       cell: ({ row }) => (
         <span className="font-bold text-slate-700">
@@ -172,12 +189,10 @@ const Subjects = () => {
       ),
     }),
     columnHelper.accessor("description", {
+      id: "description",
       header: "Description",
       cell: ({ row }) => (
-        <span
-          className="line-clamp-2 text-gray-600"
-          title={row.original.description}
-        >
+        <span className="line-clamp-2 text-gray-600" title={row.original.description}>
           {row.original.description}
         </span>
       ),
@@ -187,29 +202,40 @@ const Subjects = () => {
       header: "Action",
       cell: ({ row }) => {
         const subjectId = row.original.subject_id;
+        const editDisabled = verifyRole(300008);
+        const deleteDisabled = verifyRole(300009);
+
         return (
           <div className="flex gap-3">
-                       <button
+            <button
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 setSelectedEditSubject(row.original);
                 setEditModalOpen(true);
-                // URL me ID update karega (eg. /subjects?id=12)
-                navigate(`?id=${subjectId}`, { replace: true }); 
+                navigate(`?id=${subjectId}`, { replace: true });
               }}
-              className="flex cursor-pointer items-center justify-center rounded-lg p-1 text-blue-500 transition-colors hover:bg-blue-50"
+              disabled={editDisabled}
+              className={clsx(
+                "rounded-lg transition-colors p-1",
+                editDisabled ? "cursor-not-allowed text-gray-300" : "cursor-pointer text-blue-500 hover:bg-blue-50"
+              )}
             >
               <PencilIcon className="h-5 w-5" />
             </button>
 
-
             <button
               onClick={() => {
-                setSelectedId(subjectId);
-                setDeleteModal(true);
+                if (!deleteDisabled) {
+                  setSelectedDeleteSubject(row.original); // ✅ Passing row instead of scalar string ID
+                  setDeleteModal(true);
+                }
               }}
-              className="flex cursor-pointer items-center justify-center rounded-lg p-1 text-red-500 transition-colors hover:bg-red-50"
+              disabled={deleteDisabled}
+              className={clsx(
+                "rounded-lg transition-colors p-1",
+                deleteDisabled ? "cursor-not-allowed text-gray-200" : "cursor-pointer text-red-500 hover:bg-red-50"
+              )}
               title="Delete Subject"
             >
               <TrashIcon className="h-5 w-5" />
@@ -220,6 +246,7 @@ const Subjects = () => {
     }),
   ];
 
+  // ---------------- TANSTACK CONFIG ----------------
   const table = useReactTable({
     data: subjectList,
     columns: subjectColumns,
@@ -230,17 +257,25 @@ const Subjects = () => {
       columnVisibility,
       columnPinning,
       tableSettings,
+      viewType,
     },
     meta: {
       updateData: (rowIndex, columnId, value) => {
         skipAutoResetPageIndex();
         setSubjectList((old) =>
-          old.map((row, index) =>
-            index === rowIndex ? { ...old[rowIndex], [columnId]: value } : row,
-          ),
+          old.map((row, index) => (index === rowIndex ? { ...old[rowIndex], [columnId]: value } : row))
         );
       },
       setTableSettings,
+      setViewType,
+      onEditRole: (id) => {
+        const item = subjectList.find((s) => s.subject_id === id);
+        if (item) {
+          setSelectedEditSubject(item);
+          setEditModalOpen(true);
+          navigate(`?id=${id}`, { replace: true });
+        }
+      },
     },
     filterFns: { fuzzy: fuzzyFilter },
     enableSorting: tableSettings.enableSorting,
@@ -264,6 +299,90 @@ const Subjects = () => {
   useLockScrollbar(tableSettings.enableFullScreen);
 
   const rows = table.getRowModel().rows;
+  const WrapComponent = viewType === "list" ? Card : Box;
+
+  const shouldShowToolbar = () => {
+    if (apiFailed) return false;
+    if (loading && !isSearching) return false;
+    if (subjectList.length === 0 && !searchText) return false;
+    return true;
+  };
+
+  // ---------------- GRID SUB-VIEW COMPONENT ----------------
+  const SubjectGridView = ({ rows }) => {
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-4">
+        {rows.map((row) => {
+          const item = row.original;
+          const editDisabled = verifyRole(300008);
+          const deleteDisabled = verifyRole(300009);
+
+          return (
+            <div
+              key={item.subject_id}
+              className="group relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-red-200 text-lg font-bold text-red-700">
+                    {item.subjectName ? item.subjectName[0].toUpperCase() : "S"}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-semibold text-gray-800 truncate" title={item.subjectName}>
+                      {item.subjectName}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+
+              <p className="mt-3 text-sm text-gray-500 line-clamp-2" title={item.description}>
+                {item.description}
+              </p>
+
+              {item.addedOn && (
+                <p className="mt-2 text-xs text-gray-400">
+                  <span className="font-medium text-gray-500">Added on: </span>
+                  {formatDate(item.addedOn)}
+                </p>
+              )}
+
+              <div className="mt-4 flex items-center justify-end gap-2 border-t border-gray-100 pt-3">
+                <button
+                  onClick={() => {
+                    setSelectedEditSubject(item);
+                    setEditModalOpen(true);
+                    navigate(`?id=${item.subject_id}`, { replace: true });
+                  }}
+                  disabled={editDisabled}
+                  className={clsx(
+                    "rounded-lg transition-colors p-1",
+                    editDisabled ? "cursor-not-allowed text-gray-300" : "cursor-pointer text-blue-500 hover:bg-blue-50"
+                  )}
+                >
+                  <PencilIcon className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => {
+                    if (!deleteDisabled) {
+                      setSelectedDeleteSubject(item); // ✅ Updated for grid views as well
+                      setDeleteModal(true);
+                    }
+                  }}
+                  disabled={deleteDisabled}
+                  className={clsx(
+                    "rounded-lg transition-colors p-1",
+                    deleteDisabled ? "cursor-not-allowed text-gray-200" : "cursor-pointer text-red-500 hover:bg-red-50"
+                  )}
+                >
+                  <TrashIcon className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <Page title="Manage Subjects">
@@ -271,111 +390,84 @@ const Subjects = () => {
         <div
           className={clsx(
             "flex h-full w-full flex-col",
-            tableSettings.enableFullScreen &&
-              "dark:bg-dark-900 fixed inset-0 z-61 bg-white pt-3",
+            tableSettings.enableFullScreen && "dark:bg-dark-900 fixed inset-0 z-61 bg-white pt-3"
           )}
         >
-          {/* Header Section */}
+          {/* Header Layout */}
           <div className="relative mb-4 flex flex-wrap items-center justify-between gap-3 px-(--margin-x) pt-6 pb-6">
             <div className="space-y-1">
               <h1 className="text-foreground text-xl font-semibold tracking-tight md:text-2xl">
                 Manage Subjects
               </h1>
               <p className="text-muted-foreground text-sm font-medium">
-                Add, update, or remove subjects from the system.
+                Add, update, or remove subjects from the system streams and curriculums.
               </p>
             </div>
 
             <Button
-              onClick={() => setAddModalOpen(true)}
-              className="flex cursor-pointer items-center gap-2 rounded px-4 py-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl"
+              disabled={verifyRole(300007)}
+              onClick={() => !verifyRole(300007) && setAddModalOpen(true)}
+              className={clsx(
+                "flex cursor-pointer items-center gap-2 rounded px-4 py-2 font-semibold text-black shadow-lg transition-all hover:shadow-xl",
+                verifyRole(300007) && "cursor-not-allowed opacity-50"
+              )}
               style={{
-                background:
-                  "linear-gradient(135deg, rgb(54, 109, 176), rgb(255, 69, 66))",
+                background: verifyRole(300007) ? "#9CA3AF" : "var(--app-btn-primary)",
               }}
             >
-              <PlusIcon className="h-4 w-4 font-bold text-white" />
+              <PlusIcon className="h-4 w-4 font-bold" />
               Add Subject
             </Button>
 
             <div className="absolute bottom-0 left-0 w-full">
-              <div className="via-border h-[1.5px] w-full bg-gradient-to-r from-transparent to-transparent" />
+              <div className="h-[1.5px] w-full bg-gradient-to-r from-transparent via-border to-transparent" />
               <div className="absolute top-0 left-0 h-[1.5px] w-full bg-gradient-to-r from-transparent via-[rgb(54,109,176)] to-transparent" />
             </div>
           </div>
 
-          {/* Inline Toolbar / Search Bar */}
-          <div className="flex w-full items-center justify-between px-(--margin-x) pb-4">
-            <div className="relative w-full max-w-sm">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <MagnifyingGlassIcon
-                  className="h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-              </div>
-              <input
-                type="text"
-                value={searchText}
-                onChange={handleSearchChange}
-                className="block w-full rounded-md border-0 py-2 pr-3 pl-10 text-gray-900 ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-blue-600 focus:ring-inset sm:text-sm sm:leading-6"
-                placeholder="Search subjects..."
-              />
-            </div>
-          </div>
+          {/* Action Toolbar */}
+          {shouldShowToolbar() && (
+            <CustomToolbar
+              table={table}
+              onExportExcel={false}
+              onSearch={handleSearch}
+              searchValue={searchText}
+              hideToolbar
+            />
+          )}
 
-          {/* Main Content Area */}
-          <div
-            className={clsx(
-              "transition-content flex grow flex-col pt-3",
-              tableSettings.enableFullScreen
-                ? "overflow-hidden"
-                : "px-(--margin-x)",
-            )}
-          >
-            <Card
-              className={clsx(
-                "relative flex grow flex-col",
-                tableSettings.enableFullScreen && "overflow-hidden",
-              )}
-            >
+          {/* Table Container Segment */}
+          <div className={clsx("transition-content flex grow flex-col pt-3", tableSettings.enableFullScreen ? "overflow-hidden" : "px-(--margin-x)")}>
+            <WrapComponent className={clsx("relative flex grow flex-col", tableSettings.enableFullScreen && "overflow-hidden")}>
               {loading ? (
-                <TableSkeleton limit={limit} />
+                viewType === "list" ? <TableSkeleton limit={limit} /> : <GridSkeleton limit={limit} />
               ) : subjectList.length === 0 ? (
                 <PremiumEmptyState
-                  title={
-                    apiFailed ? "Failed to Load Subjects" : "No Subjects Found"
-                  }
+                  icon={ShieldCheckIcon}
+                  title={apiFailed ? "Failed to Load Subjects" : "No Subjects Found"}
                   desc={
                     apiFailed
-                      ? "Unable to fetch subjects. Please check your connection and try again."
+                      ? "Unable to fetch configurations. Please check your network and try again."
                       : searchText
-                        ? `No results found for "${searchText}". Try a different search term.`
-                        : "It looks like there are no subjects added yet. Start by adding a new one."
-                  }
-                  onAction={
-                    !apiFailed ? () => setAddModalOpen(true) : undefined
-                  }
-                  actionText={
-                    !apiFailed && !searchText ? "Add Subject" : undefined
+                        ? `No matching subjects found for "${searchText}".`
+                        : "It looks like there are no subjects defined yet. Start by adding a new one."
                   }
                 />
-              ) : (
+              ) : viewType === "list" ? (
                 <ListView table={table} rows={rows} flexRender={flexRender} />
+              ) : (
+                <SubjectGridView rows={rows} />
               )}
 
+              {/* Bottom Pagination Controls */}
               {subjectList.length > 0 && (
-                <div
-                  className={clsx(
-                    "pb-4 sm:pt-4",
-                    tableSettings.enableFullScreen
-                      ? "dark:bg-dark-800 bg-gray-50 px-4 sm:px-5"
-                      : "px-4 sm:px-5",
-                    !(
-                      table.getIsSomeRowsSelected() ||
-                      table.getIsAllRowsSelected()
-                    ) && "pt-4",
-                  )}
-                >
+                <div className={clsx(
+                  "pb-4 sm:pt-4",
+                  (viewType === "list" || tableSettings.enableFullScreen) && "px-4 sm:px-5",
+                  tableSettings.enableFullScreen && "dark:bg-dark-800 bg-gray-50",
+                  !(table.getIsSomeRowsSelected() || table.getIsAllRowsSelected()) && "pt-4",
+                  viewType === "grid" && !tableSettings.enableFullScreen && "mt-3"
+                )}>
                   <PaginationSection
                     table={table}
                     totalCount={total}
@@ -386,79 +478,42 @@ const Subjects = () => {
                   />
                 </div>
               )}
-            </Card>
+            </WrapComponent>
           </div>
         </div>
       </div>
 
-      {/* Render Add Subject Modal Here */}
+      {/* Modals Containers Setup */}
       <AddSubjectModal
         isOpen={addModalOpen}
         onClose={() => setAddModalOpen(false)}
-        onSuccess={() => fetchSubjects(searchText, activePage, limit)}
+        onSuccess={() => {
+          fetchSubjects(searchText, activePage, limit);
+          setAddModalOpen(false);
+        }}
       />
 
-            <EditSubjectModal
+      <EditSubjectModal
         isOpen={editModalOpen}
         onClose={() => {
           setEditModalOpen(false);
-          // Modal band hone par URL se ID hata dega
-          navigate(".", { replace: true }); 
+          setSelectedEditSubject(null);
+          navigate("?", { replace: true });
         }}
-        onSuccess={() => fetchSubjects(searchText, activePage, limit)}
         subjectData={selectedEditSubject}
+        onSuccess={handleEditSubjectSuccess}
       />
 
-
-      {/* Inline Delete Modal */}
-      {deleteModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm transition-opacity">
-          <div className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Delete Subject
-              </h3>
-              <button
-                onClick={() => setDeleteModal(false)}
-                className="rounded-full p-1 hover:bg-gray-100"
-              >
-                <XMarkIcon className="h-5 w-5 text-gray-500" />
-              </button>
-            </div>
-
-            <div className="mt-4">
-              <p className="text-sm text-gray-500">
-                Are you sure you want to delete this subject? This action cannot
-                be undone.
-              </p>
-            </div>
-
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                type="button"
-                className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
-                onClick={() => setDeleteModal(false)}
-                disabled={isDeleting}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="flex inline-flex items-center justify-center gap-2 rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none"
-                onClick={handleDeleteSubjectApi}
-                disabled={isDeleting}
-              >
-                {isDeleting ? (
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
-                ) : (
-                  <TrashIcon className="h-4 w-4" />
-                )}
-                {isDeleting ? "Deleting..." : "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ✅ Clean Modal context setup replacing the legacy modal layout snippet */}
+      <DeleteSubjectModal
+        isOpen={deleteModal}
+        onClose={() => {
+          setDeleteModal(false);
+          setSelectedDeleteSubject(null);
+        }}
+        selectedSubject={selectedDeleteSubject}
+        onSuccess={handleDeleteSubjectSuccess}
+      />
     </Page>
   );
 };

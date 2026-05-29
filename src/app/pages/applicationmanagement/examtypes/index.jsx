@@ -38,7 +38,7 @@ import { DeleteExamTypeModal } from "./DeleteExamTypeModal";
 import { EditExamType } from "./EditExamType";
 import { AddExamType } from "./AddExamType";
 import { CustomToolbar } from "./CustomToolbar";
-import { deleteExamType, getExamTypesList, updateExamTypeStatus } from "api/applicationmanagement2/examtype";
+import { deleteExamType, getExamTypesList, updateExamTypeStatus } from "api/applicationmanagement/examtype";
 
 const formatDate = (dateString) => {
   if (!dateString) return "—";

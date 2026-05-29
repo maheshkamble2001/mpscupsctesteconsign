@@ -62,3 +62,21 @@ export const updateSubject = async (data) => {
     throw error;
   }
 };
+
+  // delete-subject
+export const deleteSubject = async (data) => {
+  const access_token = Cookies.get("access_token");
+
+  const payload = isEncryptionEnabled
+    ? { reqData: encryptData({ ...data, access_token }) }
+    : { ...data, access_token };
+
+  try {
+    const response = await axios.post(`/subjects-delete`, payload);
+    const decrypted = isEncryptionEnabled ? decryptData(response) : response.data;
+    return decrypted;
+  } catch (error) {
+    console.error("Error inside deleteSubject:", error);
+    throw error;
+  }
+};

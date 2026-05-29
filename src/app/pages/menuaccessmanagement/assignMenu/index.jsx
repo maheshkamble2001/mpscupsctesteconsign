@@ -15,7 +15,6 @@ import { Badge, Box, Card } from "components/ui";
 import { useLockScrollbar, useLocalStorage } from "hooks";
 import { useSkipper } from "utils/react-table/useSkipper";
 import { PaginationSection } from "components/shared/table/PaginationSection";
-import { CustomToolbar } from "app/pages/usermanagement/ManageUsers/CustomToolbar";
 import { ListView } from "components/tables/users-datatable/ListView";
 import { TableSkeleton } from "components/shared/TableSkeleton";
 import { GridSkeleton } from "components/shared/GridSkeleton";
@@ -29,6 +28,7 @@ import { ConfirmAssignModal } from "./CofirmAssignModal";
 import { verifyRole } from "utils/utilities";
 import Cookies from "js-cookie";
 import { BUTTON_CONFIG } from "constants/app2.constant";
+import { CustomToolbar } from "components/customs/CustomToolbar";
 
 // ---------- Custom Checkbox Component ----------
 const IndeterminateCheckbox = ({ checked, indeterminate, onChange, ...props }) => {
@@ -421,10 +421,10 @@ export default function AssignMenusUI() {
             <Button
               onClick={handleSearchClick}
               disabled={!selectedRole}
-              className={`flex cursor-pointer items-center gap-2 rounded-lg px-5 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-[1.02] ${
+              className={`flex cursor-pointer items-center gap-2 rounded-lg px-5 py-2 text-sm font-semibold text-black shadow-md transition-all hover:scale-[1.02] ${
                 !selectedRole ? "opacity-50 cursor-not-allowed bg-gray-400" : "bg-gradient-to-r from-[#3368AF] to-[#FE4543]"
               }`}
-              style={{ background: !selectedRole ? BUTTON_CONFIG.DISABLED_COLOR1 : BUTTON_CONFIG.BUTTON_COLOR1 }}
+              style={{ background: !selectedRole ? "var(--app-btn-disabled)" : "var(--app-btn-primary)" }}
             >
               <MagnifyingGlassIcon className="h-4 w-4" />
               Search

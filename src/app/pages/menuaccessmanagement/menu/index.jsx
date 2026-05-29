@@ -24,7 +24,6 @@ import { useLockScrollbar, useDidUpdate, useLocalStorage } from "hooks";
 import { fuzzyFilter } from "utils/react-table/fuzzyFilter";
 import { useSkipper } from "utils/react-table/useSkipper";
 import { PaginationSection } from "components/shared/table/PaginationSection";
-import { CustomToolbar } from "app/pages/usermanagement/ManageUsers/CustomToolbar";
 import { StyledSwitch } from "components/shared/form/StyledSwitch";
 import { ListView } from "components/tables/users-datatable/ListView";
 import { TableSkeleton } from "components/shared/TableSkeleton";
@@ -39,6 +38,7 @@ import { EditMenuModal } from "./editMenu";
 import { verifyRole } from "utils/utilities";
 import { Menu, MenuIcon } from "lucide-react";
 import { BUTTON_CONFIG } from "constants/app2.constant";
+import { CustomToolbar } from "components/customs/CustomToolbar";
 
 export default function MenuList() {
   const columnHelper = createColumnHelper();
@@ -462,7 +462,7 @@ export default function MenuList() {
             <Button
               disabled={verifyRole(100004)}
               onClick={() => !verifyRole(100004) && setIsAddOpen(true)}
-              className={`flex cursor-pointer items-center gap-2 rounded px-4 py-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl 
+              className={`flex cursor-pointer items-center gap-2 rounded px-4 py-2 font-semibold text-black shadow-lg transition-all hover:shadow-xl 
 ${verifyRole(100004) ? "cursor-not-allowed opacity-50" : ""}
 ${verifyRole(100004)
                   ? "bg-[var(--app-btn-disabled)]"
