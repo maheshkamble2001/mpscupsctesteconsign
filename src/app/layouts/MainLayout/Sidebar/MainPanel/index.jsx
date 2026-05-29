@@ -8,6 +8,7 @@ import Logo from "../../../../../assets/logo.png";
 import { Menu } from "./Menu";
 import { useThemeContext } from "app/contexts/theme/context";
 import { useAuthContext } from "app/contexts/auth/context";
+import { AcademicCapIcon } from "@heroicons/react/24/outline";
 
 // ----------------------------------------------------------------------
 
@@ -26,7 +27,8 @@ export function MainPanel({ nav, setActiveSegment, activeSegment }) {
         {/* Application Logo */}
         <div className="flex h-20 w-full items-center justify-center mt-2">
           <Link to="/" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#F5A524] transition-transform duration-300 hover:scale-105">
-            <img src={Logo} alt="App Logo" className="h-7 w-7 object-contain brightness-0 invert" />
+            {/* <img src={Logo} alt="App Logo" className="h-7 w-7 object-contain brightness-0 invert" /> */}
+            <AcademicCapIcon className="h-5 w-5 text-[#0A0E17]" />
           </Link>
         </div>
 

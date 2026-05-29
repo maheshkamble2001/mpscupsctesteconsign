@@ -58,7 +58,7 @@ export function PrimePanel({ pathname, close, nav }) {
         </div>
 
         {/* Dynamic Nav Elements Scroll viewport */}
-        <div className="grow px-2.5 overflow-y-auto hide-scrollbar">
+        <div className="grow overflow-y-auto hide-scrollbar">
           <Menu
             nav={flatNav}
             pathname={pathname}

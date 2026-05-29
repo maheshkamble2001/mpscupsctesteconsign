@@ -19,7 +19,6 @@ import { useLockScrollbar, useDidUpdate, useLocalStorage } from "hooks";
 import { fuzzyFilter } from "utils/react-table/fuzzyFilter";
 import { useSkipper } from "utils/react-table/useSkipper";
 import { PaginationSection } from "components/shared/table/PaginationSection";
-import { CustomToolbar } from "../ManageUsers/CustomToolbar";
 import { StyledSwitch } from "components/shared/form/StyledSwitch";
 import { ListView } from "components/tables/users-datatable/ListView";
 import { TableSkeleton } from "components/shared/TableSkeleton";
@@ -32,6 +31,7 @@ import { DeleteUserRoleModal } from "./DeleteUserRoleModal";
 
 // Utils
 import { verifyRole } from "utils/utilities";
+import { CustomToolbar } from "components/customs/CustomToolbar";
 
 // Helper function to format date
 const formatDate = (dateString) => {
@@ -237,22 +237,22 @@ const UserRoles = () => {
       accessorKey: "role",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#f0a3a5] text-xs font-bold text-[#1E1E2D]">
+          {/* <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#f0a3a5] text-xs font-bold text-[#1E1E2D]">
             {row.original.role ? row.original.role[0].toUpperCase() : "R"}
-          </span>
+          </span> */}
           <span className="font-bold text-slate-700">{row.original.role}</span>
         </div>
       ),
     }),
-    {
-      id: "addedOn",
-      header: "Added On",
-      accessorKey: "addedOn",
-      cell: ({ getValue }) => {
-        const dateValue = getValue();
-        return <span className="text-sm text-gray-600">{formatDate(dateValue)}</span>;
-      }
-    },
+    // {
+    //   id: "addedOn",
+    //   header: "Added On",
+    //   accessorKey: "addedOn",
+    //   cell: ({ getValue }) => {
+    //     const dateValue = getValue();
+    //     return <span className="text-sm text-gray-600">{formatDate(dateValue)}</span>;
+    //   }
+    // },
     columnHelper.accessor((row) => row.status, {
       id: "status",
       header: "Status",
@@ -483,13 +483,13 @@ const UserRoles = () => {
             <Button
               disabled={verifyRole(300007)}
               onClick={() => !verifyRole(300007) && setOpen(true)}
-              className={`flex cursor-pointer items-center gap-2 rounded px-4 py-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl ${
+              className={`flex cursor-pointer items-center gap-2 rounded px-4 py-2 font-semibold text-black shadow-lg transition-all hover:shadow-xl ${
                 verifyRole(300007) ? "cursor-not-allowed opacity-50" : ""
               }`}
               style={{
                 background: verifyRole(300007)
                   ? "#9CA3AF"
-                  : "linear-gradient(135deg, rgb(54, 109, 176), rgb(255, 69, 66))",
+                  : "var(--app-btn-primary)",
               }}
             >
               <UserGroupIcon className="h-4 w-4" />
@@ -509,6 +509,7 @@ const UserRoles = () => {
               onExportExcel={false}
               onSearch={handleSearch}
               searchValue={searchText}
+              hideToolbar
             />
           )}
 

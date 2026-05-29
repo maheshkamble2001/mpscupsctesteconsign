@@ -36,7 +36,6 @@ import { useLockScrollbar, useDidUpdate, useLocalStorage } from "hooks";
 import { fuzzyFilter } from "utils/react-table/fuzzyFilter";
 import { useSkipper } from "utils/react-table/useSkipper";
 import { PaginationSection } from "components/shared/table/PaginationSection";
-import { CustomToolbar } from "./CustomToolbar";
 import { StyledSwitch } from "components/shared/form/StyledSwitch";
 import { UserDrawer } from "./UserDrawer";
 import { ModalBox } from "./ModalBox";
@@ -45,6 +44,7 @@ import { TableSkeleton } from "components/shared/TableSkeleton";
 import { GridSkeleton } from "components/shared/GridSkeleton";
 import { ListView } from "components/tables/users-datatable/ListView";
 import { UserGridView } from "./userGridview";
+import { CustomToolbar } from "components/customs/CustomToolbar";
 
 const ManageUsers = () => {
   const navigate = useNavigate();
@@ -442,13 +442,13 @@ const ManageUsers = () => {
             <Button
               disabled={verifyRole(300003)}
               onClick={() => navigate("/usermanagement/add-user")}
-              className={`flex cursor-pointer items-center gap-2 rounded px-4 py-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl ${
+              className={`flex cursor-pointer items-center gap-2 rounded px-4 py-2 font-semibold text-black shadow-lg transition-all hover:shadow-xl ${
                 verifyRole(300003) ? "cursor-not-allowed opacity-50" : ""
               }`}
               style={{
                 background: verifyRole(300003)
                   ? "#9CA3AF"
-                  : "linear-gradient(135deg, rgb(54, 109, 176), rgb(255, 69, 66))",
+                  : "var(--app-btn-primary)",
               }}
             >
               <UserPlusIcon className="h-4 w-4" />

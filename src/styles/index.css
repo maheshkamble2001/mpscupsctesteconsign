@@ -143,7 +143,7 @@
   --app-secondary: #FE4543;
 
   /* 🔘 BUTTONS */
-  --app-btn-primary: linear-gradient(135deg, rgb(54, 109, 176), rgb(255, 69, 66));
+  --app-btn-primary: linear-gradient(135deg, #fbbf24, #fb923c);
   --app-btn-primary-hover: #2B5C9A;
   --app-btn-primary-active: #1F4A7A;
   --app-btn-disabled: #9CA3AF;

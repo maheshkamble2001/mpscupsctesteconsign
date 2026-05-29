@@ -68,8 +68,8 @@ export function CustomToolbar({ table, onExportExcel, onSearch, children }) {
             </Button>
           )}
 
-          <TableConfig table={table} />
-          <ViewTypeSelect table={table} />
+          {/* <TableConfig table={table} />
+          <ViewTypeSelect table={table} /> */}
         </div>
 
         {/* Responsive Mobile View Wrapper: Choti screens par filters proper space lein */}

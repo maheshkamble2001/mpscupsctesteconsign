@@ -154,9 +154,9 @@ export function UserDrawer({ isOpen, close, user }) {
                     <div className="border-t border-slate-100 p-5 bg-white">
                       <Button
                         onClick={close}
-                        className="w-full flex cursor-pointer items-center justify-center gap-2 rounded px-4 py-2 font-semibold text-white shadow-md shadow-blue-100 transition-all hover:opacity-90 active:scale-[0.98]"
+                        className="w-full flex cursor-pointer items-center justify-center gap-2 rounded px-4 py-2 font-semibold text-black shadow-md shadow-blue-100 transition-all hover:opacity-90 active:scale-[0.98]"
                         style={{
-                          background: "linear-gradient(135deg, rgb(54, 109, 176), rgb(255, 69, 66))",
+                          background: "var(--app-btn-primary)",
                           fontSize: '13px'
                         }}
                       >

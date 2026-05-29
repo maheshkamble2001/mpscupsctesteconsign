@@ -13,11 +13,11 @@ import { CollapsibleSearch } from "components/shared/CollapsibleSearch";
 
 // ----------------------------------------------------------------------
 
-export function CustomToolbar({ table, onExportExcel, onSearch, children }) {
+export function CustomToolbar({ table, onExportExcel, hideToolbar = false, onSearch, children }) {
   const isFullScreenEnabled = table.getState().tableSettings.enableFullScreen;
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [animateModal, setAnimateModal] = useState(false);
-  
+
   const rowCount = table.getFilteredRowModel().rows.length;
   const fileSize = (rowCount * 0.35).toFixed(1);
 
@@ -47,7 +47,7 @@ export function CustomToolbar({ table, onExportExcel, onSearch, children }) {
         {/* Left Container: Search component aur filters ko saath me align karne ke liye */}
         <div className="flex flex-1 items-center gap-4 min-w-0">
           <CollapsibleSearch onSearch={onSearch} />
-          
+
           {/* Agar child (Listbox) pass hoga, toh search ke turant baad yahan dikhega */}
           {children && (
             <div className="w-64 shrink-0 hidden sm:block">
@@ -67,9 +67,10 @@ export function CustomToolbar({ table, onExportExcel, onSearch, children }) {
               <span>Export</span>
             </Button>
           )}
-
-          <TableConfig table={table} />
-          <ViewTypeSelect table={table} />
+          {!hideToolbar && <>
+            <TableConfig table={table} />
+            <ViewTypeSelect table={table} />
+          </>}
         </div>
 
         {/* Responsive Mobile View Wrapper: Choti screens par filters proper space lein */}
@@ -91,7 +92,7 @@ export function CustomToolbar({ table, onExportExcel, onSearch, children }) {
             )}
             onClick={handleCloseModal}
           />
-          
+
           {/* Modal */}
           <div
             className={clsx(

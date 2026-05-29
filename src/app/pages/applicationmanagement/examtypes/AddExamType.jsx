@@ -5,24 +5,28 @@ import {
   Transition,
   TransitionChild,
 } from "@headlessui/react";
-import { Fragment, useRef, useEffect, useState } from "react";
-import { XMarkIcon, PencilIcon, } from "@heroicons/react/24/outline";
+import { Fragment, useRef, useState } from "react";
+import { XMarkIcon, AcademicCapIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
 
-import { Input, Button } from "components/ui";
-import { editUserRole } from "api/usermanagement/roles";
-import { SaveIcon } from "lucide-react";
+// API
+// import { createExamType } from "api/usermanagement/examtypes";
 
-export const EditUserRole = ({ isOpen, onClose, selectedRole, onSuccess }) => {
+// UI Components
+import { Input, Button } from "components/ui";
+import { createExamType } from "api/applicationmanagement2/examtype";
+
+export const AddExamType = ({ isOpen, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const saveRef = useRef(null);
 
+  // Validation Schema matching field mapping
   const schema = yup.object().shape({
-    usertype: yup.string().required("Role name is required"),
+    examtype: yup.string().required("Exam type name is required"),
   });
 
   const {
@@ -30,36 +34,22 @@ export const EditUserRole = ({ isOpen, onClose, selectedRole, onSuccess }) => {
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
   } = useForm({
-    defaultValues: { usertype: "" },
+    defaultValues: { examtype: "" },
     resolver: yupResolver(schema),
   });
-
-  // Populate form field when selectedRole changes
-  useEffect(() => {
-    if (selectedRole) {
-      setValue("usertype", selectedRole.role);
-    }
-  }, [selectedRole, setValue]);
 
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      const payload = {
-        usertypeid: selectedRole?.usertypeid,
-        usertype: data.usertype,
-      };
-
-      const res = await editUserRole(payload);
-      if (res.code === 200) {
-        toast.success("User role updated successfully");
-        // Pass updated data to parent for UI update
-        onSuccess?.(payload);
+      const res = await createExamType({name: data.examtype});
+        if (res?.code === 200) {
+            toast.success("Exam type created successfully");
+        onSuccess?.();
         reset();
         onClose();
       } else {
-        toast.error(res.message || "Update failed");
+        toast.error(res?.message || "Failed to add exam type");
       }
     } catch (error) {
       toast.error("Something went wrong");
@@ -79,6 +69,7 @@ export const EditUserRole = ({ isOpen, onClose, selectedRole, onSuccess }) => {
         }}
         initialFocus={saveRef}
       >
+        {/* Backdrop filter */}
         <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
@@ -91,6 +82,7 @@ export const EditUserRole = ({ isOpen, onClose, selectedRole, onSuccess }) => {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
         </TransitionChild>
 
+        {/* Modal Element Wrapper */}
         <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
@@ -106,13 +98,7 @@ export const EditUserRole = ({ isOpen, onClose, selectedRole, onSuccess }) => {
               background: "linear-gradient(135deg, #ffffff, #fef7f7)"
             }}
           >
-            {/* Decorative top bar */}
-            <div 
-              className="h-1.5 w-full"
-           
-            />
-
-            {/* Header with Icon */}
+            {/* Header Structure */}
             <div className="px-6 pt-5 pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -122,18 +108,19 @@ export const EditUserRole = ({ isOpen, onClose, selectedRole, onSuccess }) => {
                       background: "linear-gradient(135deg, rgba(51,104,175,0.1), rgba(254,69,67,0.1))"
                     }}
                   >
-                    <PencilIcon className="h-5 w-5" style={{ color: "#3368AF" }} />
+                    <AcademicCapIcon className="h-5 w-5" style={{ color: "#3368AF" }} />
                   </div>
                   <div>
                     <DialogTitle className="text-xl font-bold text-gray-900">
-                      Update User Role
+                      Add Exam Type
                     </DialogTitle>
                     <p className="text-xs text-gray-500 mt-0.5">
-                      Edit role name and permissions
+                      Create a new category for system evaluations
                     </p>
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => {
                     reset();
                     onClose();
@@ -145,48 +132,41 @@ export const EditUserRole = ({ isOpen, onClose, selectedRole, onSuccess }) => {
               </div>
             </div>
 
-            {/* Form */}
+            {/* Input Data Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="px-6 pb-6">
               <div className="mt-2">
                 <Input
-                  label="Role Name"
-                  placeholder="Enter role here..."
-                  {...register("usertype")}
-                  error={errors?.usertype?.message}
-              />
+                  label="Exam Type Name"
+                  placeholder="Enter exam type here (e.g., Midterm, Practical)..."
+                  {...register("examtype")}
+                  error={errors?.examtype?.message}
+                />
               </div>
 
-              {/* Info note */}
-              <div className="mt-4 rounded-lg bg-blue-50 p-3">
-                <p className="text-xs text-blue-700">
-                  💡 Changes will affect all users assigned to this role.
-                </p>
-              </div>
 
-              {/* Action Buttons */}
+              {/* Functional Actions */}
               <div className="mt-6 flex gap-3">
-                <Button
+                <button
                   type="button"
                   onClick={() => {
                     reset();
                     onClose();
                   }}
-                  variant="outlined"
-                  className="flex-1 rounded border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                  className="flex-1 rounded-md border border-gray-200 bg-white py-2 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-50 outline-none"
                 >
                   Cancel
-                </Button>
+                </button>
                 <Button
                   type="submit"
                   loading={loading}
                   ref={saveRef}
-                  className="flex-1 rounded  font-semibold text-black shadow-md transition-all hover:shadow-lg"
+                  className="flex-1 rounded font-semibold text-black shadow-md transition-all hover:shadow-lg"
                   style={{
                     background: "var(--app-btn-primary)"
                   }}
                 >
-                  <SaveIcon className="mr-1.5 h-4 w-4 inline-block" />
-                  Update Role
+                  <PlusIcon className="mr-1.5 h-4 w-4 inline-block" />
+                  Create Type
                 </Button>
               </div>
             </form>

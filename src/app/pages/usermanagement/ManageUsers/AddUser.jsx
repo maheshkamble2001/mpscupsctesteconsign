@@ -322,9 +322,9 @@ export default function AddUser() {
                 <Button
                   type="submit"
                   loading={isLoading}
-                  className="rounded text-white font-semibold shadow-md hover:shadow-lg transition-all"
+                  className="rounded text-black font-semibold shadow-md hover:shadow-lg transition-all"
                   style={{
-                    background: `linear-gradient(135deg, ${srBlue} 0%, ${srRed} 100%)`
+                    background: `var(--app-btn-primary)`
                   }}
                 >
                   <UserPlusIcon className="h-4.5 w-4.5 inline-block" />

@@ -174,7 +174,8 @@ export function AuthProvider({ children }) {
         Cookies.set("userid", userid, { expires: 15 });
         Cookies.set(
           "role",
-          normalEncryptData(JSON.stringify(roleAccess || [100000], { expires: 15 }))
+          normalEncryptData(JSON.stringify(roleAccess || [100000]))
+          , { expires: 15 }
         );
         Cookies.set("roleid", roleId?.toString() || "", { expires: 15 });
         Cookies.set("rolename", rolename || "", { expires: 15 });

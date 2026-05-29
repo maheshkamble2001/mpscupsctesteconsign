@@ -75,7 +75,7 @@ export function Header() {
                 {timeGreeting}
               </span>
               <h1 className="text-[15px] font-medium tracking-tight text-slate-600 dark:text-slate-300">
-                Welcome back, <span className="text-slate-900 dark:text-white font-bold">{firstName}</span> 👋
+                Welcome back, <span className="text-slate-900 dark:text-white font-bold">{firstName}</span>
               </h1>
             </div>
           </div>

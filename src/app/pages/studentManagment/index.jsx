@@ -37,7 +37,7 @@ import { useLockScrollbar, useLocalStorage } from "hooks";
 import { fuzzyFilter } from "utils/react-table/fuzzyFilter";
 import { useSkipper } from "utils/react-table/useSkipper";
 import { PaginationSection } from "components/shared/table/PaginationSection";
-import { CustomToolbar } from "./sub/CustomToolbar"; // Reuse or duplicate for context
+// import { CustomToolbar } from "./sub/CustomToolbar"; // Reuse or duplicate for context
 import { StyledSwitch } from "components/shared/form/StyledSwitch";
 import { StudentDrawer } from "./sub/StudentDrawer"; // Build matching drawer
 import { ModalBox } from "./sub/ModalBox";
@@ -47,6 +47,7 @@ import { GridSkeleton } from "components/shared/GridSkeleton";
 import { ListView } from "components/tables/users-datatable/ListView"; // Reuse or match for students
 import { StudentGridView } from "./sub/studentGridview"; // Build matching grid view
 import { deleteStudent, getStudentList, updateStudentStatus } from "api/studentmanagement/student";
+import { CustomToolbar } from "components/customs/CustomToolbar";
 
 const ManageStudents = () => {
     const navigate = useNavigate();
@@ -452,12 +453,12 @@ const ManageStudents = () => {
                         <Button
                             disabled={verifyRole(300003)}
                             onClick={() => navigate("add-student")}
-                            className={`flex cursor-pointer items-center gap-2 rounded px-4 py-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl ${verifyRole(300003) ? "cursor-not-allowed opacity-50" : ""
+                            className={`flex cursor-pointer items-center gap-2 rounded px-4 py-2 font-semibold text-black shadow-lg transition-all hover:shadow-xl ${verifyRole(300003) ? "cursor-not-allowed opacity-50" : ""
                                 }`}
                             style={{
                                 background: verifyRole(300003)
                                     ? "#9CA3AF"
-                                    : "linear-gradient(135deg, rgb(54, 109, 176), rgb(255, 69, 66))",
+                                    : "var(--app-btn-primary)",
                             }}
                         >
                             <UserPlusIcon className="h-4 w-4" />

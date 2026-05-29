@@ -166,9 +166,9 @@ export const AddUserRole = ({ isOpen, onClose, onSuccess }) => {
                   type="submit"
                   loading={loading}
                   ref={saveRef}
-                  className="flex-1 rounded font-semibold text-white shadow-md transition-all hover:shadow-lg"
+                  className="flex-1 rounded font-semibold text-black shadow-md transition-all hover:shadow-lg"
                   style={{
-                    background: "linear-gradient(135deg, #3368AF, #FE4543)"
+                    background: "var(--app-btn-primary)"
                   }}
                 >
                   <PlusIcon className="mr-1.5 h-4 w-4 inline-block" />

@@ -13,6 +13,7 @@ export default function AuthGuard() {
   const name = Cookies.get("name");
   const email = Cookies.get("email");
   const userid = Cookies.get("userid");
+  const role = Cookies.get("role");
   // ⛔ Wait for auth initialization
   if (!isInitialized) {
     return null; // or <LoadingScreen />
@@ -22,7 +23,8 @@ export default function AuthGuard() {
   const isValidSession =
     !!accessToken &&
     !!userid &&
-    !!email;
+    !!email &&
+    !!role;
 
   if (!isValidSession && !location.pathname.includes("/login")) {
     const redirectPath = location.pathname + location.search;
