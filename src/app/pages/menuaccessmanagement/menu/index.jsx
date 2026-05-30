@@ -208,7 +208,7 @@ export default function MenuList() {
       accessorKey: "modulename",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#f0a3a5] text-xs font-bold text-[#1E1E2D]">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[oklch(18%_.04_265)] text-xs font-bold text-white">
             {row.original.modulename ? row.original.modulename[0].toUpperCase() : "M"}
           </span>
           <span className="font-bold text-slate-700">{row.original.modulename}</span>

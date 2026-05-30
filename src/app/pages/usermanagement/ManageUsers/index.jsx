@@ -290,7 +290,7 @@ const ManageUsers = () => {
       accessorKey: "name",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#f0a3a5] text-xs font-bold text-[#1E1E2D]">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[oklch(18%_.04_265)] text-xs font-bold text-white">
             {row.original.initials}
           </span>
           <span className="font-bold text-slate-700">{row.original.name}</span>
@@ -335,8 +335,8 @@ const ManageUsers = () => {
               disabled={editDisabled}
               onClick={() => !editDisabled && handleEditUser(userId)}
               className={`rounded-lg transition-colors ${editDisabled
-                  ? "cursor-not-allowed text-gray-300"
-                  : "cursor-pointer text-blue-500 hover:bg-blue-50"
+                ? "cursor-not-allowed text-gray-300"
+                : "cursor-pointer text-blue-500 hover:bg-blue-50"
                 }`}
             >
               <PencilIcon className="h-5 w-5" />
@@ -350,8 +350,8 @@ const ManageUsers = () => {
                 }
               }}
               className={`rounded-lg transition-colors ${deleteDisabled
-                  ? "cursor-not-allowed text-gray-200"
-                  : "cursor-pointer text-red-500 hover:bg-red-50"
+                ? "cursor-not-allowed text-gray-200"
+                : "cursor-pointer text-red-500 hover:bg-red-50"
                 }`}
             >
               <TrashIcon className="h-5 w-5" />

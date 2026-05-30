@@ -161,7 +161,7 @@ const MainDashboard = () => {
             className="flex flex-col justify-between gap-4 pt-2 sm:flex-row sm:items-end"
           >
             <div>
-              
+
               <h1 className="text-3xl font-bold tracking-tight text-slate-900">
                 Operations overview
               </h1>
@@ -247,7 +247,8 @@ const MainDashboard = () => {
                         initial={{ height: 0 }}
                         animate={{ height: `${(data.achieved / 200) * 180}px` }}
                         transition={{ duration: 0.8, delay: i * 0.04 }}
-                        className="absolute bottom-0 w-full rounded-t-md bg-[#F5A524] shadow-sm transition-all duration-300 group-hover:brightness-110"
+                        // bg-color ke sath humne shadow-glow ko inline laga diya:
+                        className="absolute bottom-0 w-full rounded-t-md bg-[oklch(82%_.16_75)] shadow-[0_0_60px_color-mix(in_oklab,oklch(82%_.16_75)_30%,transparent)] transition-all duration-300 group-hover:brightness-110"
                       />
                     </div>
                     <span className="text-[11px] font-bold text-slate-500 uppercase">

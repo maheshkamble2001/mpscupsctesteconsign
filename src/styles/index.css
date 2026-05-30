@@ -181,6 +181,12 @@
   /* 🌟 EFFECTS */
   --app-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 
+  /* Pehle apna gold color define karo agar nahi kiya hai toh */
+  --gold: oklch(82% 0.16 75);
+
+  /* Ab apni custom shadow define karo */
+  --shadow-glow: 0 0 60px color-mix(in oklab, var(--gold) 30%, transparent);
+
   @keyframes shimmer {
     from {
       background-position: 0 0;

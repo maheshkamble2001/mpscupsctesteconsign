@@ -28,8 +28,8 @@ export default function General() {
   const navigate = useNavigate();
 
   // Theme Colors
-  const primaryBlue = "#3368AF";
-  const primaryRed = "#FE4543";
+  const primaryColor = "var(--color-primary-600)";
+  const primaryLight = "var(--color-primary-100)";
 
   const schema = Yup.object().shape({
     oldPassword: Yup.string().required("Current password is required"),
@@ -68,13 +68,13 @@ export default function General() {
   };
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="bg-gradient-to-br from-[#f8fafc] to-[#f1f5f9]"
     >
       <div className="max-w-6xl mx-auto px-6 py-8 lg:py-12">
-        
+
         {/* Back Button */}
         <motion.button
           initial={{ x: -20, opacity: 0 }}
@@ -88,7 +88,7 @@ export default function General() {
 
         {/* Split Layout */}
         <div className="grid lg:grid-cols-2 gap-8">
-          
+
           {/* Left Side - Info Section */}
           <motion.div
             initial={{ x: -30, opacity: 0 }}
@@ -100,19 +100,19 @@ export default function General() {
               <div 
                 className="w-20 h-20 rounded-2xl flex items-center justify-center"
                 style={{ 
-                  background: `linear-gradient(135deg, ${primaryBlue}15, ${primaryRed}15)`,
+                  backgroundColor: primaryLight,
                 }}
               >
-                <ShieldCheckIcon className="h-10 w-10" style={{ color: primaryBlue }} />
+                <ShieldCheckIcon className="h-10 w-10" style={{ color: primaryColor }} />
               </div>
               
               <h1 className="text-4xl font-bold text-gray-900 leading-tight">
                 Password <br />
-                <span style={{ color: primaryBlue }}>Security</span>
+                <span style={{ color: primaryColor }}>Security</span>
               </h1>
-              
+
               <p className="text-gray-500 leading-relaxed">
-                Keep your account secure by updating your password regularly. 
+                Keep your account secure by updating your password regularly.
                 Choose a strong password that you haven't used before.
               </p>
 
@@ -126,7 +126,7 @@ export default function General() {
                   <span className="text-sm text-gray-600">Secure password storage</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <SparklesIcon className="h-5 w-5" style={{ color: primaryRed }} />
+                  <SparklesIcon className="h-5 w-5" style={{ color: primaryColor }} />
                   <span className="text-sm text-gray-600">Password strength monitoring</span>
                 </div>
               </div>
@@ -135,11 +135,11 @@ export default function General() {
               <div className="relative mt-8">
                 <div 
                   className="absolute -left-10 -bottom-10 w-32 h-32 rounded-full opacity-20"
-                  style={{ background: primaryBlue }}
+                  style={{ background: primaryColor }}
                 />
                 <div 
                   className="absolute -right-10 -top-10 w-24 h-24 rounded-full opacity-20"
-                  style={{ background: primaryRed }}
+                  style={{ background: primaryColor }}
                 />
               </div>
             </div>
@@ -152,12 +152,12 @@ export default function General() {
             transition={{ delay: 0.2 }}
           >
             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-              
+
               {/* Card Header */}
               <div className="px-8 pt-8 pb-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-xl bg-gradient-to-br from-blue-50 to-red-50">
-                    <LockClosedIcon className="h-5 w-5" style={{ color: primaryRed }} />
+                  <div className="p-2 rounded-xl" style={{ backgroundColor: primaryLight }}>
+                    <LockClosedIcon className="h-5 w-5" style={{ color: primaryColor }} />
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">Change Password</h2>
                 </div>
@@ -168,7 +168,7 @@ export default function General() {
 
               {/* Form */}
               <form onSubmit={handleSubmit(handleAddSubmit)} className="px-8 pb-8 space-y-5">
-                
+
                 {/* Current Password */}
                 <div className="group">
                   <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
@@ -219,7 +219,7 @@ export default function General() {
                   {errors?.newPassword && (
                     <p className="text-xs text-red-500 mt-1.5">{errors.newPassword.message}</p>
                   )}
-                  
+
                   {/* Password Hint */}
                   {newPasswordValue && !errors?.newPassword && (
                     <p className="text-xs text-green-600 mt-1.5 flex items-center gap-1">
@@ -275,10 +275,9 @@ export default function General() {
                   <Button
                     type="submit"
                     loading={submitLoading}
-                    className="flex-1 h-12 rounded-xl font-semibold text-white shadow-md hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
-                    style={{
-                      background: `linear-gradient(135deg, ${primaryBlue}, ${primaryRed})`
-                    }}
+                    color="primary"
+                    variant="filled"
+                    className="flex-1 h-12 rounded-xl font-semibold shadow-md hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
                   >
                     Update Password
                   </Button>
