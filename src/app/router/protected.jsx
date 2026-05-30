@@ -277,10 +277,42 @@ const protectedRoutes = {
               },
             },
             {
-              path: "manage-questions",
+              path: "manage-questions-bank",
               lazy: async () => {
                 const CurrentPage = (
                   await import("app/pages/applicationmanagement/questions/index")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+            {
+              path: "manage-questions-bank/add-question",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/questions/sub/AddQuestions")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+            {
+              path: "manage-questions-bank/update-question/:id",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/questions/sub/EditQuestions")
                 ).default;
 
                 return {

@@ -230,7 +230,7 @@ const ManageStudents = () => {
     const exportToExcel = async () => {
         try {
             setLoading(true);
-            const res = await getStudentsList({
+            const res = await getStudentList({
                 page: 1,
                 limit: total || 1000,
                 search: searchText,
@@ -264,7 +264,8 @@ const ManageStudents = () => {
             XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
             XLSX.writeFile(workbook, "Students_List.xlsx");
             toast.success("Students list exported successfully");
-        } catch {
+        } catch (error) {
+            console.error("Export operation failure:", error);
             toast.error("Failed to export students data");
         } finally {
             setLoading(false);

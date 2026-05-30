@@ -124,3 +124,25 @@ export const updateExamTypeStatus = async (data) => {
     throw error;
   }
 };
+
+export const getExamTypesDropdown = async (data) => {
+  const access_token = Cookies.get("access_token");
+
+  const payload = isEncryptionEnabled
+    ? encryptData({ ...data,access_token })
+    : { ...data,access_token };
+
+  try {
+    const response = await axios.get("/examtype-dropdown", {
+      params: isEncryptionEnabled ? { reqData: payload } : payload,
+    });
+
+    const decrypted = isEncryptionEnabled ? decryptData(response) : response.data;
+   
+    return decrypted;
+    
+  } catch (error) {
+    console.error("Error inside getExamTypesDropdown:", error);
+    throw error;
+  }
+};
