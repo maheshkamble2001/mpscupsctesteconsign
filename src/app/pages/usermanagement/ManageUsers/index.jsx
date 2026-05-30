@@ -89,7 +89,7 @@ const ManageUsers = () => {
   const [statusLoading, setStatusLoading] = useState({});
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  
+
   // Debounce timer ref
   const debounceTimerRef = useRef(null);
 
@@ -334,11 +334,10 @@ const ManageUsers = () => {
             <button
               disabled={editDisabled}
               onClick={() => !editDisabled && handleEditUser(userId)}
-              className={`rounded-lg transition-colors ${
-                editDisabled
+              className={`rounded-lg transition-colors ${editDisabled
                   ? "cursor-not-allowed text-gray-300"
                   : "cursor-pointer text-blue-500 hover:bg-blue-50"
-              }`}
+                }`}
             >
               <PencilIcon className="h-5 w-5" />
             </button>
@@ -350,11 +349,10 @@ const ManageUsers = () => {
                   setDeleteModal(true);
                 }
               }}
-              className={`rounded-lg transition-colors ${
-                deleteDisabled
+              className={`rounded-lg transition-colors ${deleteDisabled
                   ? "cursor-not-allowed text-gray-200"
                   : "cursor-pointer text-red-500 hover:bg-red-50"
-              }`}
+                }`}
             >
               <TrashIcon className="h-5 w-5" />
             </button>
@@ -419,6 +417,37 @@ const ManageUsers = () => {
   const rows = table.getRowModel().rows;
   const WrapComponent = viewType === "list" ? Card : Box;
 
+  useEffect(() => {
+    const handleExitFullScreen = () => {
+      setTableSettings((prev) => {
+        if (!prev.enableFullScreen) return prev;
+
+        // Clean up cooking state safely
+        import("js-cookie").then((Cookies) => {
+          Cookies.default.set("isFullScreenEnabled", "false");
+          window.dispatchEvent(new Event("fullscreenchange-state"));
+        });
+
+        return { ...prev, enableFullScreen: false };
+      });
+    };
+
+    // 1. Handle Keydown 'Escape'
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        handleExitFullScreen();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    // 2. Handle Navigation / Unmounting clean up
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      handleExitFullScreen(); // Reset if user clicks a sidebar link or changes page
+    };
+  }, [location.pathname]);
+
   return (
     <Page title="User Management">
       <div className="transition-content w-full pb-5">
@@ -426,7 +455,7 @@ const ManageUsers = () => {
           className={clsx(
             "flex h-full w-full flex-col",
             tableSettings.enableFullScreen &&
-              "dark:bg-dark-900 fixed inset-0 z-61 bg-white pt-3",
+            "dark:bg-dark-900 fixed inset-0 z-61 bg-white pt-3",
           )}
         >
           <div className="relative mb-4 flex flex-wrap items-center justify-between gap-3 px-(--margin-x) pt-6 pb-6">
@@ -442,9 +471,8 @@ const ManageUsers = () => {
             <Button
               disabled={verifyRole(300003)}
               onClick={() => navigate("/usermanagement/add-user")}
-              className={`flex cursor-pointer items-center gap-2 rounded px-4 py-2 font-semibold text-black shadow-lg transition-all hover:shadow-xl ${
-                verifyRole(300003) ? "cursor-not-allowed opacity-50" : ""
-              }`}
+              className={`flex cursor-pointer items-center gap-2 rounded px-4 py-2 font-semibold text-black shadow-lg transition-all hover:shadow-xl ${verifyRole(300003) ? "cursor-not-allowed opacity-50" : ""
+                }`}
               style={{
                 background: verifyRole(300003)
                   ? "#9CA3AF"
@@ -498,8 +526,8 @@ const ManageUsers = () => {
                     apiFailed
                       ? "Unable to fetch users. Please check your connection and try again."
                       : searchText
-                      ? `No results found for "${searchText}". Try a different search term.`
-                      : "It looks like there are no users registered yet. Start by adding a new user."
+                        ? `No results found for "${searchText}". Try a different search term.`
+                        : "It looks like there are no users registered yet. Start by adding a new user."
                   }
                   onAction={!apiFailed ? () => navigate("/usermanagement/add-user") : undefined}
                   actionText={!apiFailed && !searchText ? "Add User" : undefined}
@@ -515,16 +543,16 @@ const ManageUsers = () => {
                   className={clsx(
                     "pb-4 sm:pt-4",
                     (viewType === "list" || tableSettings.enableFullScreen) &&
-                      "px-4 sm:px-5",
+                    "px-4 sm:px-5",
                     tableSettings.enableFullScreen &&
-                      "dark:bg-dark-800 bg-gray-50",
+                    "dark:bg-dark-800 bg-gray-50",
                     !(
                       table.getIsSomeRowsSelected() ||
                       table.getIsAllRowsSelected()
                     ) && "pt-4",
                     viewType === "grid" &&
-                      !tableSettings.enableFullScreen &&
-                      "mt-3",
+                    !tableSettings.enableFullScreen &&
+                    "mt-3",
                   )}
                 >
                   <PaginationSection

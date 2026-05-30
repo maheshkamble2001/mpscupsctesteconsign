@@ -203,8 +203,8 @@ const ManageStudents = () => {
             throw new Error("Not allowed");
         }
         const res = await deleteStudent({
-             id: studentId 
-            });
+            id: studentId
+        });
         if (res.code === 200) {
             toast.success("Student record deleted successfully");
             await fetchStudents(searchText, activePage, limit);
@@ -430,6 +430,37 @@ const ManageStudents = () => {
 
     const rows = table.getRowModel().rows;
     const WrapComponent = viewType === "list" ? Card : Box;
+
+    useEffect(() => {
+        const handleExitFullScreen = () => {
+            setTableSettings((prev) => {
+                if (!prev.enableFullScreen) return prev;
+
+                // Clean up cooking state safely
+                import("js-cookie").then((Cookies) => {
+                    Cookies.default.set("isFullScreenEnabled", "false");
+                    window.dispatchEvent(new Event("fullscreenchange-state"));
+                });
+
+                return { ...prev, enableFullScreen: false };
+            });
+        };
+
+        // 1. Handle Keydown 'Escape'
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+                handleExitFullScreen();
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        // 2. Handle Navigation / Unmounting clean up
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+            handleExitFullScreen(); // Reset if user clicks a sidebar link or changes page
+        };
+    }, [location.pathname]);
 
     return (
         <Page title="Student Management">

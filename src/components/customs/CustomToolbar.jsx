@@ -4,17 +4,19 @@ import { HiOutlineDocumentDownload, HiOutlineX } from "react-icons/hi";
 import { BsFileSpreadsheet } from "react-icons/bs";
 import clsx from "clsx";
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Local Imports
 import { Button } from "components/ui";
 import { TableConfig } from "components/tables/users-datatable/TableConfig";
 import { CollapsibleSearch } from "components/shared/CollapsibleSearch";
+import Cookies from "js-cookie";
 
 // ----------------------------------------------------------------------
 
 export function CustomToolbar({ table, onExportExcel, hideToolbar = false, onSearch, children }) {
   const isFullScreenEnabled = table.getState().tableSettings.enableFullScreen;
+
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [animateModal, setAnimateModal] = useState(false);
 
@@ -35,6 +37,13 @@ export function CustomToolbar({ table, onExportExcel, hideToolbar = false, onSea
     onExportExcel();
     handleCloseModal();
   };
+
+  useEffect(() => {
+    Cookies.set("isFullScreenEnabled", isFullScreenEnabled ? "true" : "false");
+
+    // Broadcast the event across the active DOM view tree
+    window.dispatchEvent(new Event("fullscreenchange-state"));
+  }, [isFullScreenEnabled]);
 
   return (
     <>
@@ -186,7 +195,18 @@ export function CustomToolbar({ table, onExportExcel, hideToolbar = false, onSea
 
 function ViewTypeSelect({ table }) {
   const setViewType = table.options.meta.setViewType;
+  const setTableSettings = table.options.meta.setTableSettings; // ✅ Extract setter
   const viewType = table.getState().viewType;
+
+  const handleViewChange = (newView) => {
+    setViewType(newView);
+    
+    // ✅ Turn off fullscreen immediately when layout switches toggle
+    setTableSettings((prev) => ({
+      ...prev,
+      enableFullScreen: false
+    }));
+  };
 
   return (
     <div
@@ -194,33 +214,23 @@ function ViewTypeSelect({ table }) {
       className="flex rounded-lg bg-gray-100 px-1 py-1 text-xs-plus text-gray-800 dark:bg-gray-800 dark:text-gray-200"
     >
       <Button
-        data-tooltip
-        data-tooltip-content="List View"
-        data-tab-item
         className={clsx(
-          "shrink-0 whitespace-nowrap rounded-md px-2 py-1 font-medium transition-all duration-200",
-          viewType === "list"
-            ? "bg-white shadow-sm dark:bg-gray-700 dark:text-white"
-            : "hover:text-gray-900 focus:text-gray-900 dark:hover:text-white",
+          "shrink-0 rounded-md px-2 py-1 font-medium transition-all duration-200",
+          viewType === "list" ? "bg-white shadow-sm dark:bg-gray-700 dark:text-white" : ""
         )}
         unstyled
-        onClick={() => setViewType("list")}
+        onClick={() => handleViewChange("list")} // ✅ Updated
       >
         <TbList className="size-4" />
       </Button>
 
       <Button
-        data-tooltip
-        data-tooltip-content="Grid View"
-        data-tab-item
         className={clsx(
-          "shrink-0 whitespace-nowrap rounded-md px-2 py-1 font-medium transition-all duration-200",
-          viewType === "grid"
-            ? "bg-white shadow-sm dark:bg-gray-700 dark:text-white"
-            : "hover:text-gray-900 focus:text-gray-900 dark:hover:text-white",
+          "shrink-0 rounded-md px-2 py-1 font-medium transition-all duration-200",
+          viewType === "grid" ? "bg-white shadow-sm dark:bg-gray-700 dark:text-white" : ""
         )}
         unstyled
-        onClick={() => setViewType("grid")}
+        onClick={() => handleViewChange("grid")} // ✅ Updated
       >
         <TbGridDots className="size-4" />
       </Button>
