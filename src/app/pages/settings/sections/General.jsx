@@ -97,15 +97,15 @@ export default function General() {
             className="hidden lg:flex flex-col justify-center"
           >
             <div className="space-y-6">
-              <div 
+              <div
                 className="w-20 h-20 rounded-2xl flex items-center justify-center"
-                style={{ 
+                style={{
                   backgroundColor: primaryLight,
                 }}
               >
                 <ShieldCheckIcon className="h-10 w-10" style={{ color: primaryColor }} />
               </div>
-              
+
               <h1 className="text-4xl font-bold text-gray-900 leading-tight">
                 Password <br />
                 <span style={{ color: primaryColor }}>Security</span>
@@ -133,11 +133,11 @@ export default function General() {
 
               {/* Decorative circles */}
               <div className="relative mt-8">
-                <div 
+                <div
                   className="absolute -left-10 -bottom-10 w-32 h-32 rounded-full opacity-20"
                   style={{ background: primaryColor }}
                 />
-                <div 
+                <div
                   className="absolute -right-10 -top-10 w-24 h-24 rounded-full opacity-20"
                   style={{ background: primaryColor }}
                 />
@@ -275,7 +275,7 @@ export default function General() {
                   <Button
                     type="submit"
                     loading={submitLoading}
-                    color="primary"
+                    color="warning"
                     variant="filled"
                     className="flex-1 h-12 rounded-xl font-semibold shadow-md hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
                   >

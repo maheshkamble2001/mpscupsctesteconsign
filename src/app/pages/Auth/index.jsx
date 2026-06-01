@@ -230,10 +230,12 @@ export default function SignIn() {
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0A0E17]/80 backdrop-blur-md"
             >
-              <div className="relative flex flex-col items-center">
-                <div className="h-16 w-16 animate-spin rounded-full border-4 border-slate-700 border-t-[#F5A524]" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <AcademicCapIcon className="h-6 w-6 text-[#F5A524]" />
+              <div className="flex flex-col items-center">
+                <div className="relative">
+                  <div className="h-16 w-16 animate-spin rounded-full border-4 border-slate-700 border-t-[#F5A524]" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <AcademicCapIcon className="h-6 w-6 text-[#F5A524]" />
+                  </div>
                 </div>
                 <p className="mt-6 font-bold tracking-widest text-[#F5A524] animate-pulse text-xs uppercase">
                   Authenticating

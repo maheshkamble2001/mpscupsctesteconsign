@@ -71,7 +71,7 @@ body.is-monochrome::before {
 }
 
 /* Demo inline space */
-.inline-space > :not([hidden]) {
+.inline-space> :not([hidden]) {
   @apply mb-2.5 mr-2.5;
 }
 
