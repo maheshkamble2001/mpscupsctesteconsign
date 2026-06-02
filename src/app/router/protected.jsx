@@ -341,6 +341,41 @@ const protectedRoutes = {
                 };
               },
             },
+
+            {
+              path: "manage-exams/add-exam",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/exams/addexam")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+
+            {
+              path: "manage-exams/update-exam/:id",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/exams/updateexam")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+
           ],
         },
 

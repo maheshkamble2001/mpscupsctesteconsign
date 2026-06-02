@@ -77,3 +77,57 @@ export const updateExamOpenEnrollmentStatus = async (data) => {
     throw error;
   }
 };
+
+// Add Exam Api
+export const addExam = async (data) => {
+  const access_token = Cookies.get("access_token");
+
+  const payload = isEncryptionEnabled
+    ? { reqData: encryptData({ ...data, access_token }) }
+    : { ...data, access_token };
+
+  try {
+    const response = await axios.post(`/exam-create`, payload);
+    const decrypted = isEncryptionEnabled ? decryptData(response) : response.data;
+    return decrypted;
+  } catch (error) {
+    console.error("Error inside addExam:", error);
+    throw error;
+  }
+};
+
+// Edit Exam Api
+export const editExam = async (data) => {
+  const access_token = Cookies.get("access_token");
+
+  const payload = isEncryptionEnabled
+    ? { reqData: encryptData({ ...data, access_token }) }
+    : { ...data, access_token };
+
+  try {
+    const response = await axios.post(`/exam-edit`, payload);
+    const decrypted = isEncryptionEnabled ? decryptData(response) : response.data;
+    return decrypted;
+  } catch (error) {
+    console.error("Error inside editExam:", error);
+    throw error;
+  }
+};
+
+// Edit Exam Api
+export const deleteExam = async (data) => {
+  const access_token = Cookies.get("access_token");
+
+  const payload = isEncryptionEnabled
+    ? { reqData: encryptData({ ...data, access_token }) }
+    : { ...data, access_token };
+
+  try {
+    const response = await axios.post(`/exam-delete`, payload);
+    const decrypted = isEncryptionEnabled ? decryptData(response) : response.data;
+    return decrypted;
+  } catch (error) {
+    console.error("Error inside deleteExam:", error);
+    throw error;
+  }
+};

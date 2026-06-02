@@ -10,11 +10,18 @@ import { useEffect, useState } from "react";
 import { Button } from "components/ui";
 import { TableConfig } from "components/tables/users-datatable/TableConfig";
 import { CollapsibleSearch } from "components/shared/CollapsibleSearch";
+import { FaFileExcel } from "react-icons/fa";
 import Cookies from "js-cookie";
 
 // ----------------------------------------------------------------------
 
-export function CustomToolbar({ table, onExportExcel, hideToolbar = false, onSearch, children }) {
+export function CustomToolbar({
+  table,
+  onExportExcel,
+  hideToolbar = false,
+  onSearch,
+  children,
+}) {
   const isFullScreenEnabled = table.getState().tableSettings.enableFullScreen;
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -54,40 +61,36 @@ export function CustomToolbar({ table, onExportExcel, hideToolbar = false, onSea
         )}
       >
         {/* Left Container: Search component aur filters ko saath me align karne ke liye */}
-        <div className="flex flex-1 items-center gap-4 min-w-0">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
           <CollapsibleSearch onSearch={onSearch} />
 
           {/* Agar child (Listbox) pass hoga, toh search ke turant baad yahan dikhega */}
           {children && (
-            <div className="w-64 shrink-0 hidden sm:block">
-              {children}
-            </div>
+            <div className="hidden w-64 shrink-0 sm:block">{children}</div>
           )}
         </div>
 
         <div className="flex shrink-0 flex-wrap gap-2">
           {onExportExcel && (
             <Button
-              onClick={handleExportClick}
               variant="outlined"
-              className="h-8 space-x-2 rounded-lg px-3 text-xs font-medium transition-all duration-200 hover:scale-105 hover:shadow-md group"
+              onClick={handleExportClick}
+              className="flex items-center gap-2"
             >
-              <TbUpload className="size-4 transition-transform group-hover:-translate-y-0.5" />
-              <span>Export</span>
+              <FaFileExcel className="h-4 w-4 text-green-700" />
+              Export to Excel
             </Button>
           )}
-          {!hideToolbar && <>
-            <TableConfig table={table} />
-            <ViewTypeSelect table={table} />
-          </>}
+          {!hideToolbar && (
+            <>
+              <TableConfig table={table} />
+              <ViewTypeSelect table={table} />
+            </>
+          )}
         </div>
 
         {/* Responsive Mobile View Wrapper: Choti screens par filters proper space lein */}
-        {children && (
-          <div className="w-full sm:hidden mt-1">
-            {children}
-          </div>
-        )}
+        {children && <div className="mt-1 w-full sm:hidden">{children}</div>}
       </div>
 
       {/* Export Modal */}
@@ -97,7 +100,7 @@ export function CustomToolbar({ table, onExportExcel, hideToolbar = false, onSea
           <div
             className={clsx(
               "fixed inset-0 bg-black/50 transition-all duration-300",
-              animateModal ? "backdrop-blur-sm" : ""
+              animateModal ? "backdrop-blur-sm" : "",
             )}
             onClick={handleCloseModal}
           />
@@ -108,13 +111,13 @@ export function CustomToolbar({ table, onExportExcel, hideToolbar = false, onSea
               "relative w-full max-w-sm transform overflow-hidden rounded-xl bg-white shadow-xl transition-all duration-300 dark:bg-gray-900",
               animateModal
                 ? "translate-y-0 scale-100 opacity-100"
-                : "translate-y-4 scale-95 opacity-0"
+                : "translate-y-4 scale-95 opacity-0",
             )}
           >
             {/* Close Button */}
             <button
               onClick={handleCloseModal}
-              className="absolute right-3 top-3 rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800"
+              className="absolute top-3 right-3 rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800"
             >
               <HiOutlineX className="h-4 w-4" />
             </button>
@@ -127,7 +130,7 @@ export function CustomToolbar({ table, onExportExcel, hideToolbar = false, onSea
             </div>
 
             {/* Title */}
-            <div className="px-6 text-center mt-3">
+            <div className="mt-3 px-6 text-center">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Export Data
               </h3>
@@ -141,7 +144,9 @@ export function CustomToolbar({ table, onExportExcel, hideToolbar = false, onSea
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                  <span className="text-xs text-gray-600 dark:text-gray-300">Total Records</span>
+                  <span className="text-xs text-gray-600 dark:text-gray-300">
+                    Total Records
+                  </span>
                 </div>
                 <span className="text-sm font-semibold text-gray-900 dark:text-white">
                   {rowCount.toLocaleString()}
@@ -150,7 +155,9 @@ export function CustomToolbar({ table, onExportExcel, hideToolbar = false, onSea
               <div className="mt-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                  <span className="text-xs text-gray-600 dark:text-gray-300">Estimate File Size</span>
+                  <span className="text-xs text-gray-600 dark:text-gray-300">
+                    Estimate File Size
+                  </span>
                 </div>
                 <span className="text-sm font-semibold text-gray-900 dark:text-white">
                   ~{fileSize} KB
@@ -200,23 +207,25 @@ function ViewTypeSelect({ table }) {
 
   const handleViewChange = (newView) => {
     setViewType(newView);
-    
+
     // ✅ Turn off fullscreen immediately when layout switches toggle
     setTableSettings((prev) => ({
       ...prev,
-      enableFullScreen: false
+      enableFullScreen: false,
     }));
   };
 
   return (
     <div
       data-tab
-      className="flex rounded-lg bg-gray-100 px-1 py-1 text-xs-plus text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+      className="text-xs-plus flex rounded-lg bg-gray-100 px-1 py-1 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
     >
       <Button
         className={clsx(
           "shrink-0 rounded-md px-2 py-1 font-medium transition-all duration-200",
-          viewType === "list" ? "bg-white shadow-sm dark:bg-gray-700 dark:text-white" : ""
+          viewType === "list"
+            ? "bg-white shadow-sm dark:bg-gray-700 dark:text-white"
+            : "",
         )}
         unstyled
         onClick={() => handleViewChange("list")} // ✅ Updated
@@ -227,7 +236,9 @@ function ViewTypeSelect({ table }) {
       <Button
         className={clsx(
           "shrink-0 rounded-md px-2 py-1 font-medium transition-all duration-200",
-          viewType === "grid" ? "bg-white shadow-sm dark:bg-gray-700 dark:text-white" : ""
+          viewType === "grid"
+            ? "bg-white shadow-sm dark:bg-gray-700 dark:text-white"
+            : "",
         )}
         unstyled
         onClick={() => handleViewChange("grid")} // ✅ Updated
