@@ -324,6 +324,23 @@ const protectedRoutes = {
                 };
               },
             },
+
+            {
+              path: "manage-exams",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/exams/index")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
           ],
         },
 

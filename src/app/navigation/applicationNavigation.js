@@ -37,5 +37,15 @@ export const applicationmanagement = {
       title: 'Questions Bank',
       Icon: Squares2X2Icon,
     },
+    {
+      id: 'applicationmanagement.exams',
+      path: path(ROOT_APPLICATION, '/manage-exams'),
+      type: NAV_TYPE_ITEM,
+      role: 400004,
+      title: 'Exams',
+      Icon: Squares2X2Icon,
+    },
+
+  
   ],
 };
