@@ -45,6 +45,14 @@ export const applicationmanagement = {
       title: 'Exams',
       Icon: Squares2X2Icon,
     },
+    {
+      id: 'applicationmanagement.courses',
+      path: path(ROOT_APPLICATION, '/manage-courses'),
+      type: NAV_TYPE_ITEM,
+      role: 400004,
+      title: 'Courses',
+      Icon: Squares2X2Icon,
+    },
 
   
   ],

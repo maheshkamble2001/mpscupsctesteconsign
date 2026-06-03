@@ -376,6 +376,26 @@ const protectedRoutes = {
               },
             },
 
+
+            //manage courses
+            {
+              path: "manage-courses",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/courses/index")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+
+
           ],
         },
 
