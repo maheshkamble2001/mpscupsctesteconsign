@@ -394,6 +394,22 @@ const protectedRoutes = {
                 };
               },
             },
+            {
+              path: "manage-curriculam",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/coursecurriculam/index")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
 
 
           ],

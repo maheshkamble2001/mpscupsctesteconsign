@@ -53,6 +53,14 @@ export const applicationmanagement = {
       title: 'Courses',
       Icon: Squares2X2Icon,
     },
+    {
+      id: 'applicationmanagement.curriculam',
+      path: path(ROOT_APPLICATION, '/manage-curriculam'),
+      type: NAV_TYPE_ITEM,
+      role: 400004,
+      title: 'Course Curriculum',
+      Icon: Squares2X2Icon,
+    },
 
   
   ],

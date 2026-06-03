@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -10,7 +10,7 @@ import { Button, Input } from "components/ui";
 import { Combobox } from "components/shared/form/Combobox";
 import { Page } from "components/shared/Page";
 
-// TODO: Jab API ban jaye ensure imported properly
+// API Import
 import { addExam } from "api/applicationmanagement/exam";
 
 // Icons
@@ -21,14 +21,17 @@ import {
   ClockIcon,
   CheckBadgeIcon,
 } from "@heroicons/react/24/outline";
+import { getSubjectsDropdown } from "api/applicationmanagement/subject";
+import { getExamTypesDropdown } from "api/applicationmanagement/examtype";
 
 // ✅ Schema validation strictly typed for database protection
 const schema = yup.object().shape({
   ExamName: yup.string().required("Exam name is required"),
   ExamShortName: yup.string().required("Short name is required"),
   ExamTypeId: yup.string().required("Exam type is required"),
-  ExamMedium: yup.string().required("Exam medium is required"),
   Stage: yup.string().required("Stage is required"),
+  ExamMedium: yup.array().of(yup.string()).min(1, "At least one medium is required").required("Exam medium is required"),
+  Subjects: yup.array().of(yup.string()).min(1, "Select at least one subject").required("Subjects are required"),
   Duration: yup
     .number()
     .typeError("Duration must be a valid number")
@@ -39,20 +42,20 @@ const schema = yup.object().shape({
     .typeError("Total questions must be a number")
     .required("Total questions is required")
     .positive("Must be greater than 0"),
-  TotalMarks: yup
-    .number()
-    .typeError("Total marks must be a number")
-    .required("Total marks is required")
-    .positive("Must be greater than 0"),
   MarkPerCorrect: yup
     .number()
     .typeError("Mark per correct must be a number")
     .required("Required")
     .positive("Must be greater than 0"),
+  TotalMarks: yup
+    .number()
+    .typeError("Total marks must be a number")
+    .required("Total marks is required")
+    .positive("Must be greater than 0"),
   NegativeMark: yup
     .number()
     .typeError("Negative mark must be a number")
-    .required("Required"), // Allows negative values
+    .required("Required"),
   CuttOff: yup
     .number()
     .typeError("Cut off must be a number")
@@ -63,76 +66,121 @@ const schema = yup.object().shape({
 export default function AddExam() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
-  // Custom styling palette
   const srBlue = "#3368AF";
 
-  // Production Note: Inme aage chalkar useEffect lagake API se data bharna
-  const [examTypes, setExamTypes] = useState([
-    { label: "General", value: 1 },
-    { label: "Mock Test", value: 2 },
+  const [examTypes, setExamTypes] = useState([]);
+  const [stages] = useState([
+    { label: "Prelims", value: "Prelims" },
+    { label: "Mains", value: "Mains" },
+    { label: "Both", value: "Both" },
   ]);
-  const [mediums, setMediums] = useState([
+  const [mediums] = useState([
     { label: "English", value: "English" },
     { label: "Hindi", value: "Hindi" },
-    { label: "Bilingual", value: "English,Hindi" },
-    { label: "English,Marathi,Hindi", value: "English,Marathi,Hindi" },
+    { label: "Marathi", value: "Marathi" },
   ]);
+  const [availableSubjects, setAvailableSubjects] = useState([]);
+
+  // Fetch API Dropdowns
+  useEffect(() => {
+    const fetchMasterMetadataContext = async () => {
+      try {
+        const [subjectRes, examTypeRes] = await Promise.all([
+          getSubjectsDropdown(),
+          getExamTypesDropdown()
+        ]);
+
+        if (subjectRes?.data) {
+          const formattedSubjects = subjectRes.data.map(sub => ({
+            label: sub.label || sub.subjectName,
+            value: String(sub.value || sub.id)
+          }));
+          setAvailableSubjects(formattedSubjects);
+        }
+
+        if (examTypeRes?.data) {
+          const formattedExams = examTypeRes.data.map(exam => ({
+            label: exam.label || exam.examTypeName,
+            value: String(exam.value || exam.id)
+          }));
+          setExamTypes(formattedExams);
+        }
+      } catch (error) {
+        console.error("Master Metadata Fetch Failure Context:", error);
+        toast.error("Failed to load category taxonomy dependencies");
+      } 
+    };
+
+    fetchMasterMetadataContext();
+  }, []);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
+    watch,
+    setValue,
+    trigger,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       ExamName: "",
       ExamShortName: "",
       ExamTypeId: "",
-      ExamMedium: "",
       Stage: "",
+      ExamMedium: [],
+      Subjects: [],
       Duration: "",
       TotalQuestions: "",
-      TotalMarks: "",
       MarkPerCorrect: "",
+      TotalMarks: "",
       NegativeMark: "",
       CuttOff: "",
     },
   });
 
-  // ✅ Form Submit Action Engine
+  // Watch input targets for dynamic auto-calculation engine
+  const watchedTotalQuestions = watch("TotalQuestions");
+  const watchedMarkPerCorrect = watch("MarkPerCorrect");
+
+  // Automated Formula Engine: Total Questions * Mark Per Correct = Total Marks
+  useEffect(() => {
+    const questions = parseFloat(watchedTotalQuestions);
+    const marksPerQuestion = parseFloat(watchedMarkPerCorrect);
+
+    if (!isNaN(questions) && !isNaN(marksPerQuestion)) {
+      const calculatedTotal = Number((questions * marksPerQuestion).toFixed(2));
+      setValue("TotalMarks", calculatedTotal, { shouldValidate: true });
+    } else {
+      setValue("TotalMarks", "");
+    }
+  }, [watchedTotalQuestions, watchedMarkPerCorrect, setValue]);
+
   const handleAddExam = async (data) => {
     try {
       setIsLoading(true);
-
-      // 🚀 Payload securely typecasted matching backend data-types
+      
       const payload = {
         ExamName: data.ExamName,
         ExamShortName: data.ExamShortName,
-        ExamTypeId: Number(data.ExamTypeId), 
+        ExamTypeId: data.ExamTypeId,
         Stage: data.Stage,
-        Duration: Number(data.Duration),
-        TotalMarks: Number(data.TotalMarks), 
-        TotalQuestions: Number(data.TotalQuestions),
-        MarkPerCorrect: Number(data.MarkPerCorrect),
-        NegativeMark: Number(data.NegativeMark), 
-        CuttOff: Number(data.CuttOff),
-        ExamMedium: data.ExamMedium, 
-        
-        // Static array passed to prevent live API map errors until Multi-Select is built
-        Subjects: [1, 2, 3, 4, 5, 6, 7], 
+        Duration: data.Duration,
+        TotalQuestions: data.TotalQuestions,
+        MarkPerCorrect: data.MarkPerCorrect,
+        TotalMarks: data.TotalMarks, // Form state holds the accurate auto-calculated value
+        NegativeMark: data.NegativeMark,
+        CuttOff: data.CuttOff,
+        ExamMedium: data.ExamMedium?.join(','),
+        Subjects: data.Subjects,
       };
 
       const res = await addExam(payload);
 
       if (res?.code === 200) {
         toast.success(res.message || "Exam profile created successfully");
-        
-        // Memory leak block: Loading state off before navigating
-        setIsLoading(false); 
         navigate("/applicationmanagement/manage-exams");
-        return; // Stops execution
       } else {
         toast.error(res?.message || "Failed to create exam record");
         setIsLoading(false);
@@ -153,10 +201,9 @@ export default function AddExam() {
         }}
       >
         <div className="mx-auto max-w-7xl">
-          
           <button
             type="button"
-            onClick={() => navigate(-1)} // Dynamic history traversal
+            onClick={() => navigate(-1)}
             className="group mb-6 flex w-fit cursor-pointer items-center gap-2 rounded-lg bg-white/80 px-4 py-2 text-gray-600 shadow-sm backdrop-blur-sm transition-colors hover:text-gray-900"
           >
             <ArrowLeftIcon className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
@@ -184,7 +231,6 @@ export default function AddExam() {
             </div>
 
             <form onSubmit={handleSubmit(handleAddExam)} className="p-6 sm:p-8">
-              
               {/* Block Segment 1: Basic Information */}
               <div className="mb-8">
                 <div className="mb-4 flex items-center gap-2 border-b border-gray-200 pb-2">
@@ -211,14 +257,6 @@ export default function AddExam() {
                     required
                   />
 
-                  <Input
-                    {...register("Stage")}
-                    label="Stage"
-                    placeholder="e.g. MPSC, Prelims"
-                    error={errors?.Stage?.message}
-                    required
-                  />
-
                   <Controller
                     name="ExamTypeId"
                     control={control}
@@ -228,13 +266,31 @@ export default function AddExam() {
                         highlight
                         label="Exam Type"
                         placeholder="Select exam type"
-                        value={
-                          examTypes.find((t) => String(t.value) === String(value)) || null
-                        }
+                        value={examTypes.find((t) => String(t.value) === String(value)) || null}
                         onChange={(val) => onChange(val?.value || "")}
                         displayField="label"
                         searchFields={["label"]}
                         error={errors?.ExamTypeId?.message}
+                        className="rounded-lg"
+                        required
+                      />
+                    )}
+                  />
+
+                  <Controller
+                    name="Stage"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Combobox
+                        data={stages}
+                        highlight
+                        label="Stage"
+                        placeholder="Select stage"
+                        value={stages.find((s) => s.value === value) || null}
+                        onChange={(val) => onChange(val?.value || "")}
+                        displayField="label"
+                        searchFields={["label"]}
+                        error={errors?.Stage?.message}
                         className="rounded-lg"
                         required
                       />
@@ -248,10 +304,14 @@ export default function AddExam() {
                       <Combobox
                         data={mediums}
                         highlight
+                        multiple
                         label="Exam Medium"
                         placeholder="Select medium"
-                        value={mediums.find((m) => m.value === value) || null}
-                        onChange={(val) => onChange(val?.value || "")}
+                        value={mediums.filter((m) => value?.includes(m.value))}
+                        onChange={(val) => {
+                          const selectedValues = Array.isArray(val) ? val.map((item) => item.value) : val ? [val.value] : [];
+                          onChange(selectedValues);
+                        }}
                         displayField="label"
                         searchFields={["label"]}
                         error={errors?.ExamMedium?.message}
@@ -260,10 +320,34 @@ export default function AddExam() {
                       />
                     )}
                   />
+
+                  <Controller
+                    name="Subjects"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Combobox
+                        data={availableSubjects}
+                        highlight
+                        multiple
+                        label="Subjects"
+                        placeholder="Select subject"
+                        value={availableSubjects.filter((s) => value?.includes(s.value))}
+                        onChange={(val) => {
+                          const selectedValues = Array.isArray(val) ? val.map((item) => item.value) : val ? [val.value] : [];
+                          onChange(selectedValues);
+                        }}
+                        displayField="label"
+                        searchFields={["label"]}
+                        error={errors?.Subjects?.message}
+                        className="rounded-lg"
+                        required
+                      />
+                    )}
+                  />
                 </div>
               </div>
 
-              {/* Block Segment 2: Structure & Timing */}
+              {/* Block Segment 2: Structure, Timing & Marks */}
               <div className="mb-8">
                 <div className="mb-4 flex items-center gap-2 border-b border-gray-200 pb-2">
                   <ClockIcon className="h-5 w-5" style={{ color: srBlue }} />
@@ -292,18 +376,18 @@ export default function AddExam() {
                   />
 
                   <Input
-                    {...register("TotalMarks")}
+                    {...register("MarkPerCorrect")}
                     type="number"
                     step="0.01"
-                    label="Total Marks"
-                    placeholder="e.g. 100.22"
-                    error={errors?.TotalMarks?.message}
+                    label="Mark Per Correct"
+                    placeholder="e.g. 2"
+                    error={errors?.MarkPerCorrect?.message}
                     required
                   />
                 </div>
               </div>
 
-              {/* Block Segment 3: Marking Scheme */}
+              {/* Block Segment 3: Marking Scheme Calculations */}
               <div className="mb-8">
                 <div className="mb-4 flex items-center gap-2 border-b border-gray-200 pb-2">
                   <CheckBadgeIcon className="h-5 w-5" style={{ color: srBlue }} />
@@ -314,12 +398,14 @@ export default function AddExam() {
 
                 <div className="grid gap-5 sm:grid-cols-3">
                   <Input
-                    {...register("MarkPerCorrect")}
+                    {...register("TotalMarks")}
                     type="number"
                     step="0.01"
-                    label="Mark Per Correct"
-                    placeholder="e.g. 2"
-                    error={errors?.MarkPerCorrect?.message}
+                    label="Total Marks (Auto-calculated)"
+                    placeholder="Total Marks"
+                    error={errors?.TotalMarks?.message}
+                    disabled // System generated field to avoid human computation drift
+                    className="bg-gray-100/80 cursor-not-allowed font-semibold text-gray-700"
                     required
                   />
 
@@ -328,7 +414,7 @@ export default function AddExam() {
                     type="number"
                     step="0.01"
                     label="Negative Marking"
-                    placeholder="e.g. -1"
+                    placeholder="e.g. -0.25"
                     error={errors?.NegativeMark?.message}
                     required
                   />
@@ -358,16 +444,15 @@ export default function AddExam() {
                 <Button
                   type="submit"
                   loading={isLoading}
-                  className="cursor-pointer rounded text-white shadow-md transition-all hover:shadow-lg font-medium"
+                  className="cursor-pointer rounded text-black shadow-md transition-all hover:shadow-lg font-medium"
                   style={{
                     background: `var(--app-btn-primary)`,
                   }}
                 >
-                  <PlusIcon className="mr-1 inline-block h-4.5 w-4.5 text-white" />
+                  <PlusIcon className="mr-1 inline-block h-4.5 w-4.5 " />
                   Save Exam
                 </Button>
               </div>
-
             </form>
           </div>
         </div>

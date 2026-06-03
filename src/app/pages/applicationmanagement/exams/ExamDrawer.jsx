@@ -171,7 +171,7 @@ export function ExamDrawer({ isOpen, close, exam, onToggleSettings }) {
                             {e.Subjects.map((sub, idx) => (
                               <span
                                 key={idx}
-                                className="inline-flex items-center rounded-lg border border-blue-100/50 bg-blue-50 px-2.5 py-1 text-[12px] font-bold text-blue-600 shadow-sm"
+                                className="inline-flex items-center rounded-lg border border-blue-100/50 bg-blue-50 px-2.5 py-1 text-[12px]  text-blue-400 shadow-sm"
                               >
                                 {sub.SubjectName}
                               </span>
@@ -233,7 +233,7 @@ export function ExamDrawer({ isOpen, close, exam, onToggleSettings }) {
                     <div className="border-t border-slate-200/60 bg-white p-5 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.05)]">
                       <Button
                         onClick={close}
-                        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-3 font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-[0.98]"
+                        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-3 font-bold text-black shadow-md transition-all hover:opacity-90 active:scale-[0.98]"
                         style={{
                           background: "var(--app-btn-primary)",
                           fontSize: "14px",

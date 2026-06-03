@@ -84,11 +84,11 @@ function Item({ row, table }) {
         </div>
         
         {/* Toggle switch for status */}
-        <StyledSwitch
+        {/* <StyledSwitch
           checked={row.original.status === 1 || row.original.status === true}
           onChange={onChange}
           loading={loading}
-        />
+        /> */}
       </div>
 
       {/* Avatar & Title Row */}

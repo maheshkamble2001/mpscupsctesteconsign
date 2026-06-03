@@ -21,7 +21,7 @@ export function TableConfig({ table }) {
         </>
       }
       classNames={{
-        button: "border-solid!",
+        button: "border-solid! p-5",
       }}
     >
       {smAndDown ? (

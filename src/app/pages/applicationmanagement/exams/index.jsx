@@ -227,9 +227,6 @@ const ManageExams = () => {
       accessorKey: "ExamName",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[oklch(18%_.04_265)] text-xs font-bold text-white">
-            <DocumentTextIcon className="h-4 w-4" />
-          </span>
           <span className="font-bold text-slate-700">{row.original.ExamName}</span>
         </div>
       ),
@@ -384,7 +381,7 @@ const ManageExams = () => {
               disabled={verifyRole(300003)}
               onClick={() => navigate("add-exam")}
               className={clsx(
-                "flex items-center gap-2 rounded px-4 py-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl",
+                "flex items-center gap-2 rounded px-4 py-2 font-semibold text-black shadow-lg transition-all hover:shadow-xl",
                 verifyRole(300003) ? "cursor-not-allowed opacity-50 bg-gray-400" : "cursor-pointer"
               )}
               style={!verifyRole(300003) ? { background: "var(--app-btn-primary)" } : {}}
