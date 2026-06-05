@@ -26,7 +26,7 @@ function Actions({ row, table }) {
 
       {/* Update Button */}
       <button
-        onClick={() => table.options.meta?.onEditUser?.(row.original.course_id)}
+        onClick={() => table.options.meta?.onEditUser?.(row.original.course_id,row.original)}
         data-tooltip
         data-tab-item
         data-tooltip-content="Update"

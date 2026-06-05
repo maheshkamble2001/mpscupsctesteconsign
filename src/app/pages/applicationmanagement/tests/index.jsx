@@ -16,16 +16,16 @@ import {
   PencilIcon,
   TrashIcon,
   ArrowUpRightIcon,
-  BookOpenIcon,
-  ExclamationTriangleIcon, // Added for ModalBox config reference
+  DocumentTextIcon,
+  ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@headlessui/react";
 import * as XLSX from "xlsx";
 
-// API Import
-import { deleteCourse, getCoursesList, updateCourseStatus } from "api/applicationmanagement/courses"; // Ensure deleteCourse is exported from here
+// API Imports
+import { getTestsList, deleteTest } from "api/applicationmanagement/tests"; 
 
 // UI & Components
 import { Page } from "components/shared/Page";
@@ -41,16 +41,15 @@ import { GridSkeleton } from "components/shared/GridSkeleton";
 import { ListView } from "components/tables/users-datatable/ListView";
 import { CustomToolbar } from "components/customs/CustomToolbar";
 
-// Course Components
-import { CourseDrawer } from "./CourseDrawer";
-import { CourseGridView } from "./CourseGridview";
-import { ConfirmModal } from "components/shared/ConfirmModal"; // Local Custom Delete Modal Import
-import { StyledSwitch } from "components/shared/form/StyledSwitch";
+// Test View Specific Sub-components 
+import { TestDrawer } from "./TestDrawer";
+import { TestGridView } from "./TestGridview";
+import { ConfirmModal } from "components/shared/ConfirmModal";
 
 /* ========================================================================= 
-   REUSABLE MODALBOX FOR COURSE DELETION
+   REUSABLE MODALBOX FOR TEST DELETION
    ========================================================================= */
-function CourseDeleteModal({ show, onClose, data, list }) {
+function TestDeleteModal({ show, onClose, data, list }) {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
@@ -61,27 +60,27 @@ function CourseDeleteModal({ show, onClose, data, list }) {
     pending: {
       Icon: ExclamationTriangleIcon,
       title: "Are you sure?",
-      description: "Are you sure you want to delete this course tracker block? This will unmap all assigned schedules, batch timelines, and curriculum maps permanently.",
-      actionText: "Delete Course",
+      description: "Are you sure you want to delete this test template? This operation flags the record as deleted and unlinks it from active exam schedules permanently.",
+      actionText: "Delete Test",
     },
     success: {
-      title: "Course Deleted",
+      title: "Test Deleted",
     },
     error: {
-      description: "Something went wrong while executing the course drop schema routine from the cloud records.",
+      description: "Something went wrong while executing the test template drop routine from database records.",
     },
   };
 
   const onOk = async () => {
     if (!data) {
-      toast.error("Invalid Course Identifier Provided");
+      toast.error("Invalid Test Identifier Provided");
       return;
     }
     try {
       setConfirmLoading(true);
-      const res = await deleteCourse({ CourseId: data });
+      const res = await deleteTest({ TestId: data });
       if (res.code === 200) {
-        toast.success(res.message || "Course tracking segment dropped successfully");
+        toast.success(res.message || "Test deleted successfully");
         list();
         setSuccess(true);
         setError(false);
@@ -89,12 +88,12 @@ function CourseDeleteModal({ show, onClose, data, list }) {
           onClose();
         }, 1500);
       } else {
-        toast.error(res.message || "Failed removing course asset data blocks");
+        toast.error(res.message || "Failed removing test template records");
         setError(true);
       }
     } catch (err) {
-      console.error("Course drop routine sequence crash:", err);
-      toast.error("An error occurred during course asset deletion");
+      console.error("Test drop routine sequence crash:", err);
+      toast.error("An error occurred during test asset record deletion");
       setError(true);
     } finally {
       setConfirmLoading(false);
@@ -126,15 +125,15 @@ function CourseDeleteModal({ show, onClose, data, list }) {
 }
 
 /* ========================================================================= 
-   MAIN MANAGE COURSES PAGE MODULE
+   MAIN MANAGE TESTS PAGE MODULE
    ========================================================================= */
-const ManageCourses = () => {
+const ManageTests = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const columnHelper = createColumnHelper();
 
   // State Management
-  const [coursesList, setCoursesList] = useState([]);
+  const [testsList, setTestsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [activePage, setActivePage] = useState(1);
@@ -152,60 +151,56 @@ const ManageCourses = () => {
 
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState([]);
-  const [viewType, setViewType] = useLocalStorage("courses-table-view-type", "list");
-  const [columnVisibility, setColumnVisibility] = useLocalStorage("column-visibility-courses", {});
-  const [columnPinning, setColumnPinning] = useLocalStorage("column-pinning-courses", {});
+  const [viewType, setViewType] = useLocalStorage("tests-table-view-type", "list");
+  const [columnVisibility, setColumnVisibility] = useLocalStorage("column-visibility-tests", {});
+  const [columnPinning, setColumnPinning] = useLocalStorage("column-pinning-tests", {});
   const [autoResetPageIndex, skipAutoResetPageIndex] = useSkipper();
 
-  // Action State
+  // Action State Controls
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [statusLoading, setStatusLoading] = useState({});
+  const [selectedTest, setSelectedTest] = useState(null);
 
-  // Core Data Fetching
-  const fetchCourses = useCallback(
+  // Core Data Fetching mapped precisely to Sequelize Backend Response
+  const fetchTests = useCallback(
     async (search = searchText, page = activePage, pageSize = limit) => {
       try {
         setLoading(true);
         setApiFailed(false);
 
-        const res = await getCoursesList({ search, limit: pageSize, page });
+        const res = await getTestsList({ search, limit: pageSize, page });
 
         if (res?.code === 200) {
-          const rawCourses = res.data?.rows || [];
+          const rawTests = res.data?.rows || [];
           const totalCount = res.data?.count || 0;
 
-          const transformed = rawCourses.map((course) => ({
-            course_id: course.CourseId,
-            CourseTitle: course.CourseTitle,
-            CourseCode: course.CourseCode,
-            ExamName: course.Exam?.ExamName || "-",
-            StartDate: course.StartDate,
-            isdeleted: course.isdeleted,
-            status: course.Status == 1,
-            addedOn: course.addedon || "",
-            CoverImage: course.CoverImage,
-            CourseListPrice: course.CourseListPrice,
-            CourseLaunchPrice: course.CourseLaunchPrice,
-            NoOfSeats: course.NoOfSeats,
-            TagLine: course.TagLine,
-            Description: course.Description,
-            data: course, // Keep original data for drawer details
+          const transformed = rawTests.map((test) => ({
+            test_id: test.TestId,
+            TestName: test.TestName,
+            TestType: test.TestType,
+            ExamName: test.Exam?.ExamName || "-",
+            Duration: test.Duration ? `${test.Duration} mins` : "-",
+            TotalMarks: test.TotalMarks ?? 0,
+            PassMarks: test.PassMarks ?? 0,
+            languages: test.languages || [], // Already transformed to array via split inside API
+            subjectsCount: test.subjects?.length || 0,
+            isDeleted: test.isDeleted,
+            addedOn: test.addedon || test.createdAt || "",
+            data: test, // Keep original unmutated structure for Drawer detail view mappings
           }));
 
           setTotal(totalCount);
-          setCoursesList(transformed);
+          setTestsList(transformed);
         } else {
-          setCoursesList([]);
-          toast.error(res?.message || "Failed to fetch courses");
+          setTestsList([]);
+          toast.error(res?.message || "Failed to fetch tests");
           setApiFailed(true);
         }
       } catch (err) {
-        console.error("Fetch courses error:", err);
-        setCoursesList([]);
-        toast.error("Something went wrong while fetching courses");
+        console.error("Fetch tests endpoint runtime error:", err);
+        setTestsList([]);
+        toast.error("Something went wrong while fetching tests records");
         setApiFailed(true);
       } finally {
         setLoading(false);
@@ -216,8 +211,8 @@ const ManageCourses = () => {
   );
 
   useEffect(() => {
-    fetchCourses();
-  }, [fetchCourses]);
+    fetchTests();
+  }, [fetchTests]);
 
   // Event Handlers
   const handleSearch = (searchValue) => {
@@ -235,23 +230,23 @@ const ManageCourses = () => {
     setActivePage(newPage);
   };
 
-  const handleViewCourse = useCallback((courseId) => {
-    const course = coursesList.find((c) => c.course_id === courseId);
-    if (course) {
-      setSelectedCourse(course?.data || course); // Pass original data to drawer
+  const handleViewTest = useCallback((testId) => {
+    const test = testsList.find((t) => t.test_id === testId);
+    if (test) {
+      setSelectedTest(test?.data || test); 
       setIsDrawerOpen(true);
     }
-  }, [coursesList]);
+  }, [testsList]);
 
-  const handleEditCourse = useCallback((courseId, rowData) => {
-    navigate(`edit-course`, { state: { courseData: rowData } });
+  const handleEditTest = useCallback((testId, rowData) => {
+    navigate(`edit-test`, { state: { testData: rowData } });
   }, [navigate]);
 
+  // Comprehensive XLSX Document Downloader Routine
   const exportToExcel = async () => {
     try {
       setLoading(true);
-      // Fetch all dynamic matching records using a large ceiling threshold or total state metric
-      const res = await getCoursesList({
+      const res = await getTestsList({
         page: 1,
         limit: total || 1000,
         search: searchText,
@@ -273,27 +268,27 @@ const ManageCourses = () => {
         ).padStart(2, "0")}-${date.getFullYear()}`;
       };
 
-      // Formulate customized mapping for the Courses structural properties
-      const excelData = rawRows.map((course, idx) => ({
+      const excelData = rawRows.map((test, idx) => ({
         "SR No": idx + 1,
-        "Course Title": course.CourseTitle || "-",
-        "Course Code": course.CourseCode || "-",
-        "Exam Name": course.Exam?.ExamName || "-",
-        "Price (INR)": course.CourseLaunchPrice || course.CourseListPrice || 0,
-        "Total Seats": course.NoOfSeats || "-",
-        "Status": course.Status == 1 ? "Active" : "Inactive",
-        "Start Date": formatDate(course.StartDate),
-        "Added On": formatDate(course.addedon),
+        "Test Name": test.TestName || "-",
+        "Test Type": test.TestType || "-",
+        "Mapped Exam Name": test.Exam?.ExamName || "-",
+        "Duration": test.Duration ? `${test.Duration} mins` : "-",
+        "Total Marks": test.TotalMarks ?? 0,
+        "Pass Marks": test.PassMarks ?? 0,
+        "Available Languages": test.languages ? test.languages.join(", ") : "—",
+        "Subject Mappings Count": test.TestQuestions ? test.TestQuestions.length : 0,
+        "Creation Date": formatDate(test.addedon || test.createdAt),
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(excelData);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Courses");
-      XLSX.writeFile(workbook, "Courses_List.xlsx");
-      toast.success("Courses exported successfully");
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Tests");
+      XLSX.writeFile(workbook, "Tests_Templates_List.xlsx");
+      toast.success("Tests spreadsheet workbook downloaded successfully");
     } catch (error) {
-      console.error("Excel Export Failure:", error);
-      toast.error("Failed to export courses");
+      console.error("Excel generation routine failed:", error);
+      toast.error("Failed to export complete tests dataset records");
     } finally {
       setLoading(false);
     }
@@ -302,57 +297,38 @@ const ManageCourses = () => {
   const shouldShowToolbar = () => {
     if (apiFailed) return false;
     if (loading && !isSearching) return false;
-    if (coursesList.length === 0 && !searchText) return false;
+    if (testsList.length === 0 && !searchText) return false;
     return true;
   };
 
-  // Columns Mapping
-  const courseColumns = [
+  // TanStack Table Column Definitions
+  const testColumns = [
     columnHelper.display({
       id: "serial_no",
       header: "Sr.No",
       cell: (info) => <div className="text-center">{info.row.index + 1 + (activePage - 1) * limit}</div>,
     }),
     columnHelper.display({
-      id: "CourseTitle",
-      header: "Course Title",
-      accessorKey: "CourseTitle",
+      id: "TestName",
+      header: "Test Name",
+      accessorKey: "TestName",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <span className="font-bold text-slate-700">{row.original.CourseTitle}</span>
+          <span className="font-bold text-slate-700">{row.original.TestName}</span>
         </div>
       ),
     }),
-    { header: "Course Code", accessorKey: "CourseCode" },
-    { header: "Exam Name", accessorKey: "ExamName" },
+    { header: "Test Type", accessorKey: "TestType" },
+    { header: "Exam Association", accessorKey: "ExamName" },
+    { header: "Duration", accessorKey: "Duration" },
     columnHelper.display({
-      id: "StartDate",
-      header: "Start Date",
-      accessorKey: "StartDate",
+      id: "languages",
+      header: "Languages",
       cell: ({ row }) => {
-        const date = row.original.StartDate;
-        if (!date) return <span className="text-gray-400 font-medium italic">TBD</span>;
-        return (
-          <span className="font-medium text-slate-600">
-            {new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-          </span>
-        );
+        const langs = row.original.languages;
+        if (!langs || langs.length === 0) return <span className="text-gray-400 font-normal text-xs italic">None</span>;
+        return <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">{langs.join(", ")}</span>;
       }
-    }),
-    columnHelper.accessor((row) => row.status, {
-      id: "status",
-      header: "Status",
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <StyledSwitch
-            checked={row.original.status}
-            onChange={(checked) =>
-              handleUpdateStatus(row.original.course_id, checked)
-            }
-            loading={statusLoading[row.original.course_id] || false}
-          />
-        </div>
-      ),
     }),
     columnHelper.display({
       id: "actions",
@@ -360,21 +336,20 @@ const ManageCourses = () => {
       cell: ({ row }) => {
         const editDisabled = verifyRole(300004);
         const deleteDisabled = verifyRole(300005);
-        const courseId = row.original.course_id;
+        const testId = row.original.test_id;
 
         return (
           <div className="flex gap-3">
             <button
-              onClick={() => handleViewCourse(courseId)}
+              onClick={() => handleViewTest(testId)}
               className="btn-base btn bg-gray-150 dark:bg-surface-2 dark:text-dark-50 dark:hover:bg-surface-1 size-8 shrink-0 rounded-full p-0 text-gray-900 hover:bg-gray-200"
             >
               <ArrowUpRightIcon className="h-4 w-4" />
             </button>
             <Button
               disabled={editDisabled}
-              onClick={() => !editDisabled && handleEditCourse(courseId, row.original.data)}
-              className={`rounded-lg transition-colors ${editDisabled ? "cursor-not-allowed text-gray-300" : "cursor-pointer text-blue-500 hover:bg-blue-50"
-                }`}
+              onClick={() => !editDisabled && handleEditTest(testId, row.original.data)}
+              className={`rounded-lg transition-colors ${editDisabled ? "cursor-not-allowed text-gray-300" : "cursor-pointer text-blue-500 hover:bg-blue-50"}`}
             >
               <PencilIcon className="h-5 w-5" />
             </Button>
@@ -382,12 +357,11 @@ const ManageCourses = () => {
               disabled={deleteDisabled}
               onClick={() => {
                 if (!deleteDisabled) {
-                  setSelectedId(courseId);
+                  setSelectedId(testId);
                   setDeleteModal(true);
                 }
               }}
-              className={`rounded-lg transition-colors ${deleteDisabled ? "cursor-not-allowed text-gray-200" : "cursor-pointer text-red-500 hover:bg-red-50"
-                }`}
+              className={`rounded-lg transition-colors ${deleteDisabled ? "cursor-not-allowed text-gray-200" : "cursor-pointer text-red-500 hover:bg-red-50"}`}
             >
               <TrashIcon className="h-5 w-5" />
             </button>
@@ -397,41 +371,10 @@ const ManageCourses = () => {
     }),
   ];
 
-  // ---------------- STATUS UPDATE ----------------
-  const handleUpdateStatus = async (courseId, newStatus) => {
-    if (verifyRole(300010)) {
-      toast.error("Not allowed to change status");
-      return;
-    }
-    try {
-      setStatusLoading((prev) => ({ ...prev, [courseId]: true }));
-      const res = await updateCourseStatus({
-        CourseId: courseId,
-        status: newStatus ? 1 : 0,
-      });
-
-      if (res.code === 200) {
-        toast.success("Course status updated");
-        setCoursesList((prev) =>
-          prev.map((item) =>
-            item.course_id === courseId
-              ? { ...item, status: newStatus ? 1 : 0 }
-              : item
-          )
-        );
-      } else {
-        toast.error(res.message || "Failed to update status");
-      }
-    } catch (err) {
-      toast.error("Something went wrong while updating status");
-    } finally {
-      setStatusLoading((prev) => ({ ...prev, [courseId]: false }));
-    }
-  };
-  // Table Configuration
+  // TanStack Table Instance Orchestration Hooks
   const table = useReactTable({
-    data: coursesList,
-    columns: courseColumns,
+    data: testsList,
+    columns: testColumns,
     initialState: { pagination: { pageSize: limit } },
     state: {
       globalFilter,
@@ -444,18 +387,18 @@ const ManageCourses = () => {
     meta: {
       updateData: (rowIndex, columnId, value) => {
         skipAutoResetPageIndex();
-        setCoursesList((old) =>
+        setTestsList((old) =>
           old.map((row, index) => (index === rowIndex ? { ...old[rowIndex], [columnId]: value } : row))
         );
       },
       deleteRow: (row) => {
-        setSelectedId(row.original.course_id);
+        setSelectedId(row.original.test_id);
         setDeleteModal(true);
       },
       setTableSettings,
       setViewType,
-      onViewUser: handleViewCourse,
-      onEditUser: handleEditCourse,
+      onViewUser: handleViewTest,
+      onEditUser: handleEditTest,
     },
     filterFns: { fuzzy: fuzzyFilter },
     enableSorting: tableSettings.enableSorting,
@@ -481,7 +424,7 @@ const ManageCourses = () => {
   const WrapComponent = viewType === "list" ? Card : Box;
 
   return (
-    <Page title="Manage Courses">
+    <Page title="Manage Tests">
       <div className="transition-content w-full pb-5">
         <div
           className={clsx(
@@ -489,20 +432,20 @@ const ManageCourses = () => {
             tableSettings.enableFullScreen && "dark:bg-dark-900 fixed inset-0 z-61 bg-white pt-3"
           )}
         >
-          {/* Header Section */}
+          {/* Header Layout Container */}
           <div className="relative mb-4 flex flex-wrap items-center justify-between gap-3 px-(--margin-x) pt-6 pb-6">
             <div className="space-y-1">
               <h1 className="text-foreground text-xl font-semibold tracking-tight md:text-2xl">
-                Manage Courses
+                Manage Tests
               </h1>
               <p className="text-muted-foreground text-sm font-medium">
-                Update course details, schedules, and configurations.
+                Configure quiz configurations, language availability matrices, and subject content.
               </p>
             </div>
 
             <Button
               disabled={verifyRole(300003)}
-              onClick={() => navigate("add-course")}
+              onClick={() => navigate("add-test")}
               className={clsx(
                 "flex items-center gap-2 rounded px-4 py-2 font-semibold text-black shadow-lg transition-all hover:shadow-xl",
                 verifyRole(300003) ? "cursor-not-allowed opacity-50 bg-gray-400" : "cursor-pointer"
@@ -510,7 +453,7 @@ const ManageCourses = () => {
               style={!verifyRole(300003) ? { background: "var(--app-btn-primary)" } : {}}
             >
               <PlusIcon className="h-4 w-4" />
-              Add Course
+              Add Test
             </Button>
 
             <div className="absolute bottom-0 left-0 w-full">
@@ -523,7 +466,7 @@ const ManageCourses = () => {
             <CustomToolbar table={table} onExportExcel={exportToExcel} onSearch={handleSearch} searchValue={searchText} />
           )}
 
-          {/* Table Container */}
+          {/* Dynamic Content Switching Wrapper Area */}
           <div
             className={clsx(
               "transition-content flex grow flex-col pt-3",
@@ -538,26 +481,26 @@ const ManageCourses = () => {
             >
               {loading ? (
                 viewType === "list" ? <TableSkeleton limit={limit} /> : <GridSkeleton limit={limit} />
-              ) : coursesList.length === 0 ? (
+              ) : testsList.length === 0 ? (
                 <PremiumEmptyState
-                  title={apiFailed ? "Failed to Load Courses" : "No Courses Found"}
+                  title={apiFailed ? "Failed to Load Tests" : "No Tests Found"}
                   desc={
                     apiFailed
-                      ? "Unable to fetch courses. Please check your network connection or API URL."
+                      ? "Unable to pull test configurations from server records. Check connectivity parameters."
                       : searchText
-                        ? `No results found for "${searchText}". Try a different search term.`
-                        : "It looks like there are no courses registered yet. Start by adding a new course."
+                        ? `No matching records found for search string: "${searchText}".`
+                        : "No test evaluation structures have been populated within this ecosystem module yet."
                   }
-                  onAction={!apiFailed && !searchText ? () => navigate("add-course") : undefined}
-                  actionText={!apiFailed && !searchText ? "Add Course" : undefined}
+                  onAction={!apiFailed && !searchText ? () => navigate("add-test") : undefined}
+                  actionText={!apiFailed && !searchText ? "Add Test" : undefined}
                 />
               ) : viewType === "list" ? (
                 <ListView table={table} rows={rows} flexRender={flexRender} />
               ) : (
-                <CourseGridView table={table} rows={rows} />
+                <TestGridView table={table} rows={rows} />
               )}
 
-              {coursesList.length > 0 && (
+              {testsList.length > 0 && (
                 <div
                   className={clsx(
                     "pb-4 sm:pt-4",
@@ -582,21 +525,21 @@ const ManageCourses = () => {
         </div>
       </div>
 
-      {/* Course Custom Delete Modal Instance wired to State Controls */}
-      <CourseDeleteModal
+      {/* Confirmation Drop Flow Trigger */}
+      <TestDeleteModal
         show={deleteModal}
         onClose={() => { setDeleteModal(false); setSelectedId(""); }}
         data={selectedId}
-        list={fetchCourses}
+        list={fetchTests}
       />
 
-      <CourseDrawer
+      <TestDrawer
         isOpen={isDrawerOpen}
         close={() => setIsDrawerOpen(false)}
-        course={selectedCourse}
+        test={selectedTest}
       />
     </Page>
   );
 };
 
-export default ManageCourses;
+export default ManageTests;

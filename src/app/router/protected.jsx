@@ -395,6 +395,38 @@ const protectedRoutes = {
               },
             },
             {
+              path: "manage-courses/add-course",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/courses/AddCourse")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+            {
+              path: "manage-courses/edit-course",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/courses/EditCourse")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+            {
               path: "manage-curriculam",
               lazy: async () => {
                 const CurrentPage = (
@@ -410,7 +442,54 @@ const protectedRoutes = {
                 };
               },
             },
+            {
+              path: "manage-tests",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/tests/index")
+                ).default;
 
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+            {
+              path: "manage-tests/add-test",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/tests/AddTests")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+            {
+              path: "manage-tests/edit-test",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/tests/UpdateTests")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
 
           ],
         },

@@ -4,8 +4,7 @@ import Cookies from "js-cookie";
 
 const isEncryptionEnabled = import.meta.env.VITE_ENCRYPTION === "true";
 
-//  Get Course Api
-export const getCoursesList = async (data) => {
+export const getTestsList = async (data) => {
   const access_token = Cookies.get("access_token");
 
   const payload = isEncryptionEnabled
@@ -13,7 +12,7 @@ export const getCoursesList = async (data) => {
     : { ...data,access_token };
 
   try {
-    const response = await axios.get("/exam-courses-list", {
+    const response = await axios.get("/test/list", {
       params: isEncryptionEnabled ? { reqData: payload } : payload,
     });
 
@@ -22,47 +21,14 @@ export const getCoursesList = async (data) => {
     return decrypted;
     
   } catch (error) {
-    console.error("Error inside getCoursesList:", error);
-    throw error;
-  }
-};
-
-export const getExamDropdown = async (data) => {
-  const access_token = Cookies.get("access_token");
-
-  const payload = isEncryptionEnabled
-    ? encryptData({ ...data,access_token })
-    : { ...data,access_token };
-
-  try {
-    const response = await axios.get("/exam-dropdown", {
-      params: isEncryptionEnabled ? { reqData: payload } : payload,
-    });
-
-    const decrypted = isEncryptionEnabled ? decryptData(response) : response.data;
-   
-    return decrypted;
-    
-  } catch (error) {
-    console.error("Error inside getExamDropdown:", error);
+    console.error("Error inside getTestsList:", error);
     throw error;
   }
 };
 
 
-export const addCourse = async (data, option) => {
-  return decryptData(
-    await axios.post(`/exam-courses-create`, data, option)
-  );
-};
-
-export const editCourse = async (data, option) => {
-  return decryptData(
-    await axios.post(`/exam-courses-edit`, data, option)
-  );
-};
-
-export const deleteCourse = async (data) => {
+// add-test
+export const addTest = async (data) => {
   const access_token = Cookies.get("access_token");
 
   const payload = isEncryptionEnabled
@@ -70,16 +36,17 @@ export const deleteCourse = async (data) => {
     : { ...data, access_token };
 
   try {
-    const response = await axios.post(`/exam-courses-delete`, payload);
+    const response = await axios.post(`/test/add`, payload);
     const decrypted = isEncryptionEnabled ? decryptData(response) : response.data;
     return decrypted;
   } catch (error) {
-    console.error("Error inside deleteCourse:", error);
+    console.error("Error inside addTest:", error);
     throw error;
   }
 };
 
-export const updateCourseStatus = async (data) => {
+// update-test
+export const updateTest = async (data) => {
   const access_token = Cookies.get("access_token");
 
   const payload = isEncryptionEnabled
@@ -87,11 +54,46 @@ export const updateCourseStatus = async (data) => {
     : { ...data, access_token };
 
   try {
-    const response = await axios.post(`/exam-courses-update-status`, payload);
+    const response = await axios.post(`/test/edit`, payload);
     const decrypted = isEncryptionEnabled ? decryptData(response) : response.data;
     return decrypted;
   } catch (error) {
-    console.error("Error inside updateCourseStatus:", error);
+    console.error("Error inside updateTest:", error);
+    throw error;
+  }
+};
+
+  // delete-test
+export const deleteTest = async (data) => {
+  const access_token = Cookies.get("access_token");
+
+  const payload = isEncryptionEnabled
+    ? { reqData: encryptData({ ...data, access_token }) }
+    : { ...data, access_token };
+
+  try {
+    const response = await axios.post(`/test/delete`, payload);
+    const decrypted = isEncryptionEnabled ? decryptData(response) : response.data;
+    return decrypted;
+  } catch (error) {
+    console.error("Error inside deleteTest:", error);
+    throw error;
+  }
+};
+
+export const updateTestStatus = async (data) => {
+  const access_token = Cookies.get("access_token");
+
+  const payload = isEncryptionEnabled
+    ? { reqData: encryptData({ ...data, access_token }) }
+    : { ...data, access_token };
+
+  try {
+    const response = await axios.post(`/test/status`, payload);
+    const decrypted = isEncryptionEnabled ? decryptData(response) : response.data;
+    return decrypted;
+  } catch (error) {
+    console.error("Error inside updateTestStatus:", error);
     throw error;
   }
 };

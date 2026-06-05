@@ -72,7 +72,7 @@ export const ModuleFormModal = ({ isOpen, onClose, editData, onSave }) => {
                 </TransitionChild>
 
                 <TransitionChild as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
-                    <DialogPanel className="relative w-full max-w-4xl overflow-hidden rounded-2xl shadow-2xl bg-white" style={{ background: "linear-gradient(135deg, #ffffff, #fafdff)" }}>
+                    <DialogPanel className="relative w-full max-w-md overflow-hidden rounded-2xl shadow-2xl bg-white" style={{ background: "linear-gradient(135deg, #ffffff, #fafdff)" }}>
                         <div className="px-6 pt-5 pb-2">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">

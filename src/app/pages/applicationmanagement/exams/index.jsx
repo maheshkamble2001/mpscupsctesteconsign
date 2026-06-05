@@ -46,6 +46,7 @@ import { ListView } from "components/tables/users-datatable/ListView";
 import { ExamGridView } from "./ExamGridview";
 import { CustomToolbar } from "components/customs/CustomToolbar";
 import { ModalBox } from "./modelBox";
+import * as XLSX from "xlsx";
 
 const ManageExams = () => {
   const navigate = useNavigate();
@@ -204,9 +205,63 @@ const ManageExams = () => {
   }, [navigate]);
 
   const exportToExcel = async () => {
-    toast.error("Export to Excel will be integrated soon");
-  };
+    try {
+      setLoading(true);
+      
+      // Fetch all matching datasets ignoring local pagination splits
+      const res = await getExamsList({
+        search: searchText,
+        limit: total || 1000,
+        page: 1,
+      });
 
+      const rawExams = res?.data?.exams || [];
+
+      if (rawExams.length === 0) {
+        toast.error("No data available to export");
+        return;
+      }
+
+      const formatDate = (dateString) => {
+        if (!dateString) return "—";
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return "—";
+        return `${String(date.getDate()).padStart(2, "0")}-${String(
+          date.getMonth() + 1
+        ).padStart(2, "0")}-${date.getFullYear()}`;
+      };
+
+      // Transform raw dataset into formatted Excel payload structure
+      const excelData = rawExams.map((exam, idx) => ({
+        "SR No": idx + 1,
+        "Exam Name": exam.ExamName || "-",
+        "Short Name": exam.ExamShortName || "-",
+        "Exam Type": exam.ExamType?.name || "-",
+        "Stage": exam.Stage || "-",
+        "Duration": exam.Duration ? `${exam.Duration} mins` : "-",
+        "Total Questions": exam.TotalQuestions ?? 0,
+        "Total Marks": exam.TotalMarks ?? 0,
+        "Cut-off Marks": exam.CuttOff ?? 0,
+        "Medium": exam.ExamMedium || "-",
+        "Catalogue Visiblity": exam.ShowInCatalogue ? "Yes" : "No",
+        "Free Trial Status": exam.AllFreeTrial ? "Enabled" : "Disabled",
+        "Open Enrollment": exam.OpenEnrollment ? "Yes" : "No",
+        "Status": exam.isdeleted ? "Inactive" : "Active",
+        "Added On": formatDate(exam.addedon),
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Exams");
+      XLSX.writeFile(workbook, "Exams_List.xlsx");
+      toast.success("Exams exported successfully");
+    } catch (error) {
+      console.error("Excel Export Failure:", error);
+      toast.error("Failed to export exams");
+    } finally {
+      setLoading(false);
+    }
+  };
   const shouldShowToolbar = () => {
     if (apiFailed) return false;
     if (loading && !isSearching) return false;
