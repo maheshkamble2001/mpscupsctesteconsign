@@ -23,5 +23,13 @@ export const studentmanagement = {
             title: 'Students',
             Icon: Squares2X2Icon,
         },
+        {
+            id: 'studentmanagement.studentexams',
+            path: path(ROOT_DASHBOARDS, '/student-exams'),
+            type: NAV_TYPE_ITEM,
+            role: 100001,
+            title: 'Student Exams',
+            Icon: Squares2X2Icon,
+        },
     ]
 }

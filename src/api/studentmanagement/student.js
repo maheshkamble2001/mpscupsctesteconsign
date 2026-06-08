@@ -61,6 +61,25 @@ export const getStateDropdown = async (data) => {
     }
 };
 
+export const getStudentExams = async (data) => {
+    const access_token = Cookies.get("access_token");
+    const payload = isEncryptionEnabled
+        ? encryptData({ ...data, access_token })
+        : { ...data, access_token };
+    try {
+        const response = await axios.get(`/student-exams`, {
+            params: isEncryptionEnabled ? { reqData: payload } : payload,
+        });
+        const decrypted = isEncryptionEnabled
+            ? decryptData(response)
+            : response.data;
+        return decrypted;
+    } catch (error) {
+        console.error("Error inside getStudentExams:", error);
+        throw error;
+    }
+};
+
 export const updateStudentStatus = async (data) => {
   const access_token = Cookies.get("access_token");
 
@@ -124,6 +143,23 @@ export const addStudent = async (data) => {
     return decrypted;
   } catch (error) {
     console.error("Error inside addStudent:", error);
+    throw error;
+  }
+};
+
+export const assignExamsToStudent = async (data) => {
+  const access_token = Cookies.get("access_token");
+
+  const payload = isEncryptionEnabled
+    ? { reqData: encryptData({ ...data, access_token }) }
+    : { ...data, access_token };
+
+  try {
+    const response = await axios.post(`/assign-exams-to-student`, payload);
+    const decrypted = isEncryptionEnabled ? decryptData(response) : response.data;
+    return decrypted;
+  } catch (error) {
+    console.error("Error inside assignExamsToStudent:", error);
     throw error;
   }
 };

@@ -232,6 +232,22 @@ const protectedRoutes = {
                 };
               },
             },
+            {
+              path: "student-exams",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/studentManagment/studentExams/index")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
 
           ],
         },
@@ -479,6 +495,38 @@ const protectedRoutes = {
               lazy: async () => {
                 const CurrentPage = (
                   await import("app/pages/applicationmanagement/tests/UpdateTests")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+            {
+              path: "upcoming-exams",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/UpcomingExams/index")
+                ).default;
+
+                return {
+                  Component: () => (
+                    <RoleGuard userAllowRole={300003}>
+                      <CurrentPage />
+                    </RoleGuard>
+                  ),
+                };
+              },
+            },
+            {
+              path: "upcoming-exams/add",
+              lazy: async () => {
+                const CurrentPage = (
+                  await import("app/pages/applicationmanagement/UpcomingExams/AddUpcomingExam")
                 ).default;
 
                 return {

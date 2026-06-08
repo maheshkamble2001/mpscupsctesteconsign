@@ -38,6 +38,14 @@ export const applicationmanagement = {
       Icon: Squares2X2Icon,
     },
     {
+      id: 'applicationmanagement.competativexams',
+      path: path(ROOT_APPLICATION, '/upcoming-exams'),
+      type: NAV_TYPE_ITEM,
+      role: 400004,
+      title: 'Upcoming Exams',
+      Icon: Squares2X2Icon,
+    },
+    {
       id: 'applicationmanagement.exams',
       path: path(ROOT_APPLICATION, '/manage-exams'),
       type: NAV_TYPE_ITEM,
