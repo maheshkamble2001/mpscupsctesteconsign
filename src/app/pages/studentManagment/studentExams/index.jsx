@@ -25,7 +25,7 @@ import { toast } from "sonner";
 
 // Local Custom Delete Modal Import
 import { ConfirmModal } from "components/shared/ConfirmModal";
-import { assignExamsToStudent, getStudentExams } from "api/studentmanagement/student";
+import { assignExamsToStudent, deleteStudentExam, getStudentExams } from "api/studentmanagement/student";
 import { getExamDropdown } from "api/applicationmanagement/courses";
 
 /* ========================================================================= 
@@ -321,7 +321,7 @@ function AssignMultipleExamsModalBox({ isOpen, onClose, studentId, existingExams
                                     type="submit"
                                     disabled={submitting || selectedExamIds.length === 0}
                                     ref={saveRef}
-                                    className="px-5 py-2 text-white text-xs font-bold rounded-xl transition-all shadow-sm hover:shadow-md disabled:opacity-40"
+                                    className="px-5 py-2 text-black text-xs font-bold rounded-xl transition-all shadow-sm hover:shadow-md disabled:opacity-40"
                                     style={{
                                         background: "var(--app-btn-primary, #000000)"
                                     }}
@@ -341,40 +341,31 @@ function AssignMultipleExamsModalBox({ isOpen, onClose, studentId, existingExams
 /* ========================================================================= 
    REUSABLE DELETION CONTEXT MODAL
    ========================================================================= */
+/* ========================================================================= 
+   SIMPLIFIED DELETION MODAL (ALTERNATIVE)
+   ========================================================================= */
 function DeleteExamModalBox({ show, onClose, data, refreshList }) {
-    const [confirmLoading, setConfirmLoading] = useState(false);
-    const [success, setSuccess] = useState(false);
-    const [error, setError] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
-    const state = error ? "error" : success ? "success" : "pending";
+    const handleDelete = async () => {
+        if (!data || isDeleting) return;
 
-    const messages = {
-        pending: {
-            Icon: ExclamationTriangleIcon,
-            title: "Drop Exam Schedule?",
-            description: "Are you sure you want to remove this scheduled exam assignment?",
-            actionText: "Delete",
-        },
-        success: { title: "Exam Assignment Deleted" },
-        error: { description: "An operational variance blocked removing this exam instance." },
-    };
-
-    const onOk = async () => {
-        if (!data) return;
         try {
-            setConfirmLoading(true);
-            // Replace this mock timeout block with your live deletion endpoint execution if available:
-            // const res = await deleteStudentExam(data);
-            setTimeout(() => {
+            setIsDeleting(true);
+            const res = await deleteStudentExam({ id: data });
+
+            if (res.code==200) {
                 toast.success("Exam allocation removed successfully");
-                refreshList();
-                setSuccess(true);
-                setTimeout(() => onClose(), 1000);
-            }, 1000);
+                await refreshList(); // Wait for refresh to complete
+                onClose(); // Close after refresh
+            } else {
+                toast.error(res?.message || "Something went wrong");
+            }
         } catch (err) {
-            setError(true);
+            console.error("Delete error:", err);
+            toast.error("Failed to remove exam");
         } finally {
-            setConfirmLoading(false);
+            setIsDeleting(false);
         }
     };
 
@@ -382,10 +373,17 @@ function DeleteExamModalBox({ show, onClose, data, refreshList }) {
         <ConfirmModal
             show={show}
             onClose={onClose}
-            messages={messages}
-            onOk={onOk}
-            confirmLoading={confirmLoading}
-            state={state}
+            messages={{
+                pending: {
+                    Icon: ExclamationTriangleIcon,
+                    title: "Drop Exam Schedule?",
+                    description: "Are you sure you want to remove this scheduled exam assignment?",
+                    actionText: "Delete",
+                }
+            }}
+            onOk={handleDelete}
+            confirmLoading={isDeleting}
+            state="pending"
         />
     );
 }
@@ -440,7 +438,7 @@ export default function StudentExamsPage() {
                 <div className="flex h-full w-full flex-col bg-white min-h-0">
 
                     <div className="relative border-b border-slate-100 px-6 py-5 flex flex-col gap-1 flex-shrink-0">
-                        <h1 className="text-foreground text-xl font-bold tracking-tight md:text-2xl">Student Exams Lookup</h1>
+                        <h1 className="text-foreground text-xl font-bold tracking-tight md:text-2xl">Student Exams</h1>
                         <p className="text-muted-foreground text-sm font-medium">Audit and manage student test records maps</p>
                     </div>
 
@@ -463,7 +461,7 @@ export default function StudentExamsPage() {
                                                 setSearchKey(e.target.value);
                                                 if (isSearch) setIsSearch(false);
                                             }}
-                                            placeholder="e.g. student@email.com or +91 9876543210"
+                                            placeholder="Search Email or Mobile"
                                         />
                                     </div>
                                     <button type="submit" className="h-11 px-5 bg-black hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-center gap-1.5">
@@ -526,12 +524,12 @@ export default function StudentExamsPage() {
                                                             <h4 className="text-xs font-bold text-slate-900 truncate">
                                                                 {exam.Exam?.ExamName || "N/A Assigned Exam"}
                                                             </h4>
-                                                            {/* <button
+                                                            <button
                                                                 onClick={() => { setDeleteTargetId(exam.id); setIsDeleteModalOpen(true); }}
                                                                 className="p-1 rounded border border-rose-100 hover:bg-rose-50 text-rose-600 opacity-0 group-hover:opacity-100 transition-opacity"
                                                             >
                                                                 <TrashIcon className="h-3 w-3" />
-                                                            </button> */}
+                                                            </button>
                                                         </div>
                                                         <div className="mt-2 flex flex-wrap items-center gap-2">
                                                             <span className="flex items-center gap-1 text-[9px] font-extrabold text-[#3368AF] bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded">

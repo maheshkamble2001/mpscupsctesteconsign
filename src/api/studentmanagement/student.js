@@ -163,3 +163,20 @@ export const assignExamsToStudent = async (data) => {
     throw error;
   }
 };
+
+export const deleteStudentExam = async (data) => {
+  const access_token = Cookies.get("access_token");
+
+  const payload = isEncryptionEnabled
+    ? { reqData: encryptData({ ...data, access_token }) }
+    : { ...data, access_token };
+
+  try {
+    const response = await axios.post(`/delete-student-exam`, payload);
+    const decrypted = isEncryptionEnabled ? decryptData(response) : response.data;
+    return decrypted;
+  } catch (error) {
+    console.error("Error inside deleteStudentExam:", error);
+    throw error;
+  }
+};

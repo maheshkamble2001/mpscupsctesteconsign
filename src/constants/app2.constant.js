@@ -15,7 +15,8 @@ export const VERSION = "1.0.0";
  */
 export const REDIRECT_URL_KEY = "redirect";
 export const HOME_PATH = "/";
-export const GHOST_ENTRY_PATH = "/login";
+// export const GHOST_ENTRY_PATH = "/login";
+export const GHOST_ENTRY_PATH = "/home";
 export const FORGOT_PASSWORD_PATH = "/forgot-password";
 export const UNAUTHORIZED_PATH = "/403";
 

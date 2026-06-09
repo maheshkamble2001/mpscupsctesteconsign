@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import clsx from "clsx";
 import Cookies from "js-cookie";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   LogOut,
   Settings,
@@ -24,6 +24,7 @@ import { Search } from "components/template/Search";
 
 export function Header() {
   const { logout } = useAuthContext();
+  const navigate = useNavigate();
   const { mdAndUp, smAndUp } = useBreakpointsContext();
 
   const [name, setName] = useState(Cookies.get("name") || "Admin");
@@ -165,7 +166,9 @@ export function Header() {
                 
                 {/* Sign Out Button */}
                 <button
-                  onClick={logout}
+                  onClick={()=>{logout()
+                    navigate("/login")
+                  }}
                   className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-rose-600 transition-colors hover:bg-rose-50 dark:hover:bg-rose-500/10"
                 >
                   <LogOut size={16} />
