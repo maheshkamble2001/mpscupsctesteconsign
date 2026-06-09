@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LockClosedIcon, UserIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { LockClosedIcon, UserIcon, EyeIcon, EyeSlashIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { AcademicCapIcon } from "@heroicons/react/24/solid";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -47,6 +47,8 @@ export default function SignIn() {
       if (response?.code === 200) {
         toast.success(response?.message || "Login Successful");
         navigate("/dashboards/home", { replace: true });
+        
+        // navigate("/student/home", { replace: true });
       } else {
         toast.error(response?.message || "Invalid credentials");
         setIsLoading(false);
@@ -76,7 +78,8 @@ export default function SignIn() {
 
       if (response?.code === 200) {
         toast.success(response?.message || "Success");
-        navigate("/dashboards/home", { replace: true });
+        // navigate("/dashboards/home", { replace: true });
+        navigate("/student/home", { replace: true });
       } else {
         toast.error(response?.message || "Authentication failed");
         setIsLoading(false);
@@ -97,13 +100,24 @@ export default function SignIn() {
           {/* Subtle Background Pattern */}
           <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(245,165,36,0.05)_1px,transparent_1px)] [background-size:24px_24px] opacity-60" />
           
-          <div className="relative z-10">
+          <div className="relative z-10 flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5A524] shadow-lg">
                 <AcademicCapIcon className="h-6 w-6 text-[#0A0E17]" />
               </div>
               <span className="text-xl font-bold tracking-wide text-white">Mock Test</span>
             </div>
+
+            {/* DESKTOP BACK BUTTON */}
+            <motion.button
+              whileHover={{ x: -3 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate("/")}
+              className="flex items-center gap-2 rounded-xl border border-slate-800 bg-[#0A0E17]/60 px-4 py-2 text-xs font-bold text-slate-300 backdrop-blur-sm transition-colors hover:border-slate-700 hover:text-white"
+            >
+              <ArrowLeftIcon className="h-3.5 w-3.5" />
+              Back to Home
+            </motion.button>
           </div>
 
           <div className="relative z-10 max-w-md">
@@ -125,19 +139,30 @@ export default function SignIn() {
         {/* RIGHT SIDE: Login Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative">
           
-          {/* Mobile Logo (Visible only on small screens) */}
-          <div className="absolute top-8 left-6 sm:left-12 flex lg:hidden items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5A524]">
-              <AcademicCapIcon className="h-5 w-5 text-[#0A0E17]" />
+          {/* MOBILE HEADER: Logo & Mobile Back Button */}
+          <div className="absolute top-8 left-6 sm:left-12 right-6 sm:right-12 flex lg:hidden items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5A524]">
+                <AcademicCapIcon className="h-5 w-5 text-[#0A0E17]" />
+              </div>
+              <span className="text-lg font-bold tracking-wide text-slate-900">Mock Test</span>
             </div>
-            <span className="text-lg font-bold tracking-wide text-slate-900">Mock Test</span>
+
+            {/* MOBILE BACK BUTTON */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate("/public/home")}
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 shadow-sm transition-colors active:bg-slate-100"
+            >
+              <ArrowLeftIcon className="h-4 w-4 stroke-[2.5]" />
+            </motion.button>
           </div>
 
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full max-w-[420px]"
+            className="w-full max-w-[420px] mt-12 lg:mt-0"
           >
             <div className="mb-10">
               <h2 className="text-3xl font-black tracking-tight text-slate-900 mb-2">
