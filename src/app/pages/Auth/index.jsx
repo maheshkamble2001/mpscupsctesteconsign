@@ -109,7 +109,7 @@ export default function SignIn() {
             </div>
 
             {/* DESKTOP BACK BUTTON */}
-            <motion.button
+            {/* <motion.button
               whileHover={{ x: -3 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => navigate("/")}
@@ -117,7 +117,7 @@ export default function SignIn() {
             >
               <ArrowLeftIcon className="h-3.5 w-3.5" />
               Back to Home
-            </motion.button>
+            </motion.button> */}
           </div>
 
           <div className="relative z-10 max-w-md">
