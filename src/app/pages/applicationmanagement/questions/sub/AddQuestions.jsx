@@ -363,7 +363,7 @@ export default function AddQuestion() {
                                 <Button
                                     type="button"
                                     variant="outlined"
-                                    onClick={() => navigate("/questionbank/manage-questions")}
+                                    onClick={() => navigate("/applicationmanagement/manage-questions-bank")}
                                 >
                                     Cancel
                                 </Button>
